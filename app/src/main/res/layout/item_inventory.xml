@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Первая строка: Название и количество -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="Видеорегистратор"/>
+
+        <TextView
+            android:id="@+id/item_quantity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:textSize="16sp"
+            android:gravity="end"
+            tools:text="x2"/>
+    </LinearLayout>
+
+    <!-- Вторая строка: Группа и состояние -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginTop="4dp">
+
+        <TextView
+            android:id="@+id/item_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            tools:text="Оборудование СКБ"/>
+
+        <TextView
+            android:id="@+id/item_condition"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:gravity="end"
+            tools:text="Исправен"/>
+    </LinearLayout>
+
+    <!-- Третья строка: Описание (только если есть) -->
+    <TextView
+        android:id="@+id/item_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="14sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:visibility="gone"
+        tools:text="Устройство записи видео в вагоне"
+        tools:visibility="visible"/>
+
+    <!-- Иконка фотографии (если есть) -->
+    <ImageView
+        android:id="@+id/item_photo_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/ic_photo_camera"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/tv_wagon_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/tv_scan_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#666"/>
+
+</LinearLayout>
