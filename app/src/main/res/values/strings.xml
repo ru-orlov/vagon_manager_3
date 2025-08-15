@@ -36,4 +36,5 @@
         <item>Отсутствует</item>
     </string-array>
     <string name="save">Сохранить</string>
+    <string name="login_error_empty">Имя пользователя и пароль обязательны для заполнения</string>
 </resources>
