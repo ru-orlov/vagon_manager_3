@@ -82,6 +82,7 @@ public class DbContract {
     // Таблица наименований инвентаря
     public static class InventoryItems {
         public static final String TABLE_NAME = "inventory_items";
+
         public static final String COLUMN_ID = "id";
         public static final String COLUMN_UUID = "uuid";
         public static final String COLUMN_GROUP_ID = "group_id";
@@ -101,8 +102,17 @@ public class DbContract {
                 + COLUMN_QUANTITY + " INTEGER DEFAULT 1,"
                 + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_UPDATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted')),"
-                + "FOREIGN KEY (" + COLUMN_GROUP_ID + ") REFERENCES " + InventoryGroups.TABLE_NAME + "(" + COLUMN_ID + "))";
+                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' "
+                + "CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted')),"
+                + "FOREIGN KEY (" + COLUMN_GROUP_ID + ") REFERENCES "
+                + InventoryGroups.TABLE_NAME + "(" + InventoryGroups.COLUMN_ID + "))";
+
+        // Индексы для ускорения запросов
+        public static final String INDEX_GROUP_ID = "CREATE INDEX idx_inventory_items_group_id "
+                + "ON " + TABLE_NAME + "(" + COLUMN_GROUP_ID + ")";
+
+        public static final String INDEX_SYNC_STATUS = "CREATE INDEX idx_inventory_items_sync_status "
+                + "ON " + TABLE_NAME + "(" + COLUMN_SYNC_STATUS + ")";
     }
 
     // Таблица инвентаря вагона

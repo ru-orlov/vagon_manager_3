@@ -16,20 +16,36 @@ public class InventoryItem {
     private Date updatedAt;
     private String syncStatus;
 
+    // ADD THIS NO-ARGUMENT CONSTRUCTOR
     public InventoryItem() {
-        this.uuid = UUID.randomUUID().toString();
-        this.quantity = 1;
-        this.createdAt = new Date();
-        this.updatedAt = new Date();
-        this.syncStatus = "synced";
+        // Default constructor
+        // You can leave this empty, or initialize fields to default values if necessary
+        // For example:
+        // this.name = "";
+        // this.quantity = 0;
+        // this.syncStatus = "NEW"; // Or whatever default makes sense
     }
 
-    public InventoryItem(long groupId, String name, String description, int quantity) {
-        this();
+    public InventoryItem(long id, String uuid, long groupId, String name, String description,
+                         int quantity, Date createdAt, Date updatedAt, String syncStatus) {
+        this.id = id;
+        this.uuid = uuid;
         this.groupId = groupId;
         this.name = name;
         this.description = description;
         this.quantity = quantity;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.syncStatus = syncStatus;
+    }
+
+    public InventoryItem(String uuid, long groupId, String name, String description, int quantity, String syncStatus) {
+        this.uuid = uuid;
+        this.groupId = groupId;
+        this.name = name;
+        this.description = description;
+        this.quantity = quantity;
+        this.syncStatus = syncStatus;
     }
 
     // Геттеры
@@ -115,7 +131,6 @@ public class InventoryItem {
         return name + " (Кол-во: " + quantity + ")";
     }
 
-    // Преобразование в ContentValues для работы с SQLite
     public android.content.ContentValues toContentValues() {
         android.content.ContentValues values = new android.content.ContentValues();
         values.put(DbContract.InventoryItems.COLUMN_UUID, uuid);
@@ -123,15 +138,19 @@ public class InventoryItem {
         values.put(DbContract.InventoryItems.COLUMN_NAME, name);
         values.put(DbContract.InventoryItems.COLUMN_DESCRIPTION, description);
         values.put(DbContract.InventoryItems.COLUMN_QUANTITY, quantity);
-        values.put(DbContract.InventoryItems.COLUMN_CREATED_AT, createdAt.getTime());
-        values.put(DbContract.InventoryItems.COLUMN_UPDATED_AT, updatedAt.getTime());
+        // Handle null dates before calling getTime() if they can be null
+        if (createdAt != null) {
+            values.put(DbContract.InventoryItems.COLUMN_CREATED_AT, createdAt.getTime());
+        }
+        if (updatedAt != null) {
+            values.put(DbContract.InventoryItems.COLUMN_UPDATED_AT, updatedAt.getTime());
+        }
         values.put(DbContract.InventoryItems.COLUMN_SYNC_STATUS, syncStatus);
         return values;
     }
 
-    // Создание объекта из Cursor
     public static InventoryItem fromCursor(android.database.Cursor cursor) {
-        InventoryItem item = new InventoryItem();
+        InventoryItem item = new InventoryItem(); // This line should now be valid
         item.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)));
         item.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UUID)));
         item.setGroupId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)));
@@ -140,10 +159,15 @@ public class InventoryItem {
         item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)));
 
         long createdAtMillis = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT));
-        item.setCreatedAt(new Date(createdAtMillis));
+        if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT))) {
+            item.setCreatedAt(new Date(createdAtMillis));
+        }
+
 
         long updatedAtMillis = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UPDATED_AT));
-        item.setUpdatedAt(new Date(updatedAtMillis));
+        if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UPDATED_AT))) {
+            item.setUpdatedAt(new Date(updatedAtMillis));
+        }
 
         item.setSyncStatus(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_SYNC_STATUS)));
 
