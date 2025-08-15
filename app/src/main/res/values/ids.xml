@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="view_temp_id" type="id"/>
+    <item name="fragment_container" type="id"/>
+    <item name="custom_button" type="id"/>
+</resources>

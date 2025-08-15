@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">WagonManager3</string>
+    <string name="scan_qr_code">Отсканировать QR-code</string>
+    <string name="view_history">Посмотреть историю</string>
+    <string name="history_title">История сканирований</string>
+    <string name="no_history_items">Нет данных о сканированиях</string>
+    <string name="scan_time_format">%1$td.%1$tm.%1$tY %1$tH:%1$tM</string>
+    <string name="username_hint">Имя пользователя</string>
+    <string name="password_hint">Пароль</string>
+    <string name="login_button">Войти</string>
+    <string name="login_error">Неверное имя пользователя или пароль</string>
+    <string name="item_name_hint">Название оборудования</string>
+    <string name="item_group_hint">Группа оборудования</string>
+    <string name="item_quantity_hint">Количество</string>
+    <string name="item_condition_hint">Состояние</string>
+    <string name="item_description_hint">Описание</string>
+    <string name="item_photo_title">Фотография оборудования</string>
+    <string name="take_photo_button">Сделать фото</string>
+    <string name="remove_photo_button">Удалить фото</string>
+    <string name="save_button">Сохранить</string>
+    <string name="cancel_button">Отмена</string>
+    <string name="empty_inventory_message">Оборудование не найдено\nИспользуйте кнопку + для добавления</string>
+    <string-array name="inventory_groups">
+        <item>Внутреннее оборудование</item>
+        <item>Электрооборудование</item>
+        <item>Оборудование ЭЧТК</item>
+        <item>Оборудование СКБ и СПП</item>
+        <item>Оборудование системы видео-инструментатора</item>
+        <item>Оборудование ПАК ИМ (WI-FI)</item>
+    </string-array>
+
+    <string-array name="inventory_conditions">
+        <item>Исправен</item>
+        <item>Требует ремонта</item>
+        <item>Неисправен</item>
+        <item>Отсутствует</item>
+    </string-array>
+    <string name="save">Сохранить</string>
 </resources>
