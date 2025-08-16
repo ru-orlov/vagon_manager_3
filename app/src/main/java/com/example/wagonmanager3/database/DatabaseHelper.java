@@ -1,6 +1,5 @@
 package com.example.wagonmanager3.database;
 
-
 import static com.example.wagonmanager3.database.DbContract.InventoryItems.TABLE_NAME;
 
 import android.content.ContentValues;
@@ -42,28 +41,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // При обновлении базы данных
-        db.execSQL("DROP TABLE IF EXISTS " + DbContract.ChangeLogs.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + DbContract.ScanHistory.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + DbContract.WagonInventory.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + DbContract.InventoryGroups.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + DbContract.Wagons.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + DbContract.Users.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbContract.Wagons.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbContract.InventoryGroups.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbContract.InventoryItems.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbContract.WagonInventory.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbContract.ScanHistory.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DbContract.ChangeLogs.TABLE_NAME);
         onCreate(db);
     }
 
-    public void addScanHistory(ScanHistory historyItem) {
-        SQLiteDatabase db = this.getWritableDatabase();
+    public User getUserByUsername(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        User user = null;
 
-        ContentValues values = new ContentValues();
-        values.put(DbContract.ScanHistory.COLUMN_UUID, historyItem.getUuid());
-        values.put(DbContract.ScanHistory.COLUMN_WAGON_UUID, historyItem.getWagonUuid());
-        values.put(DbContract.ScanHistory.COLUMN_WAGON_NUMBER, historyItem.getWagonNumber());
-        values.put(DbContract.ScanHistory.COLUMN_USER_UUID, historyItem.getUserUuid());
-        values.put(DbContract.ScanHistory.COLUMN_SCAN_TIME, historyItem.getScanTime().getTime());
+        Cursor cursor = db.query(
+                DbContract.Users.TABLE_NAME,
+                null,
+                DbContract.Users.COLUMN_USERNAME + " = ?",
+                new String[]{username},
+                null, null, null);
 
-        db.insert(DbContract.ScanHistory.TABLE_NAME, null, values);
-        db.close();
+        if (cursor.moveToFirst()) {
+            user = new User(
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_UUID)),
+                    username,
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_PASSWORD_HASH)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_FULL_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_ROLE)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_IS_ACTIVE)) == 1
+            );
+        }
+        cursor.close();
+        return user;
     }
 
     public String getWagonNumberByUuid(String wagonUuid) {
@@ -84,6 +94,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
 
         return number;
+    }
+
+    public void addScanHistory(ScanHistory historyItem) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DbContract.ScanHistory.COLUMN_UUID, historyItem.getUuid());
+        values.put(DbContract.ScanHistory.COLUMN_WAGON_UUID, historyItem.getWagonUuid());
+        values.put(DbContract.ScanHistory.COLUMN_WAGON_NUMBER, historyItem.getWagonNumber());
+        values.put(DbContract.ScanHistory.COLUMN_USER_UUID, historyItem.getUserUuid());
+        values.put(DbContract.ScanHistory.COLUMN_SCAN_TIME, historyItem.getScanTime().getTime());
+
+        db.insert(DbContract.ScanHistory.TABLE_NAME, null, values);
+        db.close();
     }
 
     public List<ScanHistory> getAllScanHistory() {
@@ -113,31 +137,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return historyList;
-    }
-
-    public User getUserByUsername(String username) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        User user = null;
-
-        Cursor cursor = db.query(
-                DbContract.Users.TABLE_NAME,
-                null,
-                DbContract.Users.COLUMN_USERNAME + " = ?",
-                new String[]{username},
-                null, null, null);
-
-        if (cursor.moveToFirst()) {
-            user = new User(
-                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_UUID)),
-                    username,
-                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_PASSWORD_HASH)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_FULL_NAME)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_ROLE)),
-                    cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_IS_ACTIVE)) == 1
-            );
-        }
-        cursor.close();
-        return user;
     }
 
     public long insertInventoryItem(InventoryItem item) {
@@ -206,20 +205,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             inventory.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_QUANTITY)));
             inventory.setCondition(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_CONDITION)));
             inventory.setNotes(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_NOTES)));
-
-            // Поля из связанных таблиц
-            inventory.setItemName(cursor.getString(cursor.getColumnIndexOrThrow("item_name")));
-            inventory.setItemDescription(cursor.getString(cursor.getColumnIndexOrThrow("item_description")));
-            inventory.setGroupName(cursor.getString(cursor.getColumnIndexOrThrow("group_name")));
-
-            // Даты
             long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_CREATED_AT));
             inventory.setCreatedAt(new Date(createdAt));
-
             long updatedAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_UPDATED_AT));
             inventory.setUpdatedAt(new Date(updatedAt));
-
-            // Статус синхронизации
             inventory.setSyncStatus(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_SYNC_STATUS)));
         }
 
@@ -338,10 +327,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 inventory.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_QUANTITY)));
                 inventory.setCondition(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_CONDITION)));
                 inventory.setNotes(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_NOTES)));
-
-                // Поля из связанных таблиц
-                inventory.setItemName(cursor.getString(cursor.getColumnIndexOrThrow("item_name")));
-                inventory.setGroupName(cursor.getString(cursor.getColumnIndexOrThrow("group_name")));
 
                 // Даты
                 long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_CREATED_AT));

@@ -83,10 +83,10 @@ public class InventoryEditActivity extends AppCompatActivity {
             WagonInventory inventory = dbHelper.getWagonInventoryById(inventoryId);
 
             if (inventory != null) {
-                etItemName.setText(inventory.getItemName());
+                etItemName.setText(inventory.getUuid());
                 etDescription.setText(inventory.getNotes());
                 etQuantity.setText(String.valueOf(inventory.getQuantity()));
-                actvGroup.setText(inventory.getGroupName());
+                actvGroup.setText((int) inventory.getWagonId());
                 actvCondition.setText(inventory.getCondition());
 
                 // Загрузка фото (если есть)
@@ -135,11 +135,11 @@ public class InventoryEditActivity extends AppCompatActivity {
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         WagonInventory inventory = new WagonInventory();
-        inventory.setItemName(name);
+        //inventory.setUuid(name);
         inventory.setUuid(wagonUuid);
         inventory.setNotes(description);
         inventory.setQuantity(quantity);
-        inventory.setGroupName(group);
+        //inventory.setGroupName(group);
         inventory.setCondition(condition);
        // inventory.setPhotoPath(currentPhotoPath);
 

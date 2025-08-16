@@ -3,7 +3,6 @@ package com.example.wagonmanager3.models;
 import java.util.Date;
 
 public class WagonInventory {
-    // Существующие поля
     private long id;
     private String uuid;
     private long wagonId;
@@ -14,11 +13,6 @@ public class WagonInventory {
     private Date createdAt;
     private Date updatedAt;
     private String syncStatus;
-
-    // Новые поля для JOIN-запроса
-    private String itemName;
-    private String itemDescription;
-    private String groupName;
 
     public long getId() {
         return id;
@@ -100,27 +94,4 @@ public class WagonInventory {
         this.syncStatus = syncStatus;
     }
 
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public String getItemDescription() {
-        return itemDescription;
-    }
-
-    public void setItemDescription(String itemDescription) {
-        this.itemDescription = itemDescription;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
 }
