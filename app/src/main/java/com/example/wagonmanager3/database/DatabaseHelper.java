@@ -8,9 +8,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.wagonmanager3.models.InventoryGroup;
 import com.example.wagonmanager3.models.InventoryItem;
 import com.example.wagonmanager3.models.ScanHistory;
 import com.example.wagonmanager3.models.User;
+import com.example.wagonmanager3.models.Wagon;
 import com.example.wagonmanager3.models.WagonInventory;
 
 import java.util.ArrayList;
@@ -75,6 +77,83 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return user;
     }
+
+    public long addUser(User user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = user.toContentValues();
+
+        long id = db.insert(DbContract.Users.TABLE_NAME, null, values);
+
+        // Логируем создание пользователя
+        if (id != -1) {
+            addChangeLog(
+                    DbContract.Users.TABLE_NAME,
+                    id,
+                    "create",
+                    null,
+                    values.toString()
+            );
+        }
+
+        return id;
+    }
+
+    public long addWagon(Wagon wagon) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = wagon.toContentValues();
+
+        long id = db.insert(DbContract.Wagons.TABLE_NAME, null, values);
+
+        // Логируем создание вагона
+        if (id != -1) {
+            addChangeLog(
+                    DbContract.Wagons.TABLE_NAME,
+                    id,
+                    "create",
+                    null,
+                    values.toString()
+            );
+        }
+
+        return id;
+    }
+
+    public long addInventoryGroup(InventoryGroup group) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = group.toContentValues();
+
+        long id = db.insert(DbContract.InventoryGroups.TABLE_NAME, null, values);
+
+        // Логируем создание группы
+        if (id != -1) {
+            addChangeLog(
+                    DbContract.InventoryGroups.TABLE_NAME,
+                    id,
+                    "create",
+                    null,
+                    values.toString()
+            );
+        }
+
+        return id;
+    }
+
+    public List<InventoryGroup> getAllInventoryGroups() {
+        List<InventoryGroup> groups = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        try (Cursor cursor = db.query(
+                DbContract.InventoryGroups.TABLE_NAME,
+                null, null, null, null, null, null)) {
+
+            while (cursor.moveToNext()) {
+                groups.add(InventoryGroup.fromCursor(cursor));
+            }
+        }
+        return groups;
+    }
+
+
 
     public String getWagonNumberByUuid(String wagonUuid) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -410,5 +489,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return wagons;
     }
 
+    public void clearAllTables() {
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        db.execSQL("DELETE FROM " + DbContract.WagonInventory.TABLE_NAME);
+        db.execSQL("DELETE FROM " + DbContract.InventoryItems.TABLE_NAME);
+        db.execSQL("DELETE FROM " + DbContract.InventoryGroups.TABLE_NAME);
+        db.execSQL("DELETE FROM " + DbContract.ScanHistory.TABLE_NAME);
+        db.execSQL("DELETE FROM " + DbContract.Wagons.TABLE_NAME);
+        db.execSQL("DELETE FROM " + DbContract.Users.TABLE_NAME);
+
+        // Сбрасываем автоинкремент
+        db.execSQL("DELETE FROM sqlite_sequence");
+    }
 }
