@@ -3,4 +3,8 @@
     <item name="view_temp_id" type="id"/>
     <item name="fragment_container" type="id"/>
     <item name="custom_button" type="id"/>
+    <item name="inventory_list" type="id"/>
+    <item name="action_add_item" type="id"/>
+    <item name="action_share_qr" type="id"/>
+    <item name="empty_text" type="id"/>
 </resources>

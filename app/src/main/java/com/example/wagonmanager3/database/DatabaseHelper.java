@@ -315,5 +315,115 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowsAffected;
     }
 
+    public List<WagonInventory> getWagonInventory(String wagonUuid) {
+        List<WagonInventory> inventoryList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Запрос с JOIN для получения полной информации об инвентаре вагона
+        String query = "SELECT wi.*, " +
+                "ii.name AS item_name, " +
+                "ig.name AS group_name " +
+                "FROM " + DbContract.WagonInventory.TABLE_NAME + " wi " +
+                "JOIN " + DbContract.InventoryItems.TABLE_NAME + " ii ON wi." + DbContract.WagonInventory.COLUMN_ITEM_ID + " = ii." + DbContract.InventoryItems.COLUMN_ID + " " +
+                "JOIN " + DbContract.InventoryGroups.TABLE_NAME + " ig ON ii." + DbContract.InventoryItems.COLUMN_GROUP_ID + " = ig." + DbContract.InventoryGroups.COLUMN_ID + " " +
+                "WHERE wi." + DbContract.WagonInventory.COLUMN_WAGON_ID + " = (SELECT " + DbContract.Wagons.COLUMN_ID + " FROM " + DbContract.Wagons.TABLE_NAME + " WHERE " + DbContract.Wagons.COLUMN_UUID + " = ?)";
+
+        Cursor cursor = db.rawQuery(query, new String[]{wagonUuid});
+
+        if (cursor.moveToFirst()) {
+            do {
+                WagonInventory inventory = new WagonInventory();
+                // Основные поля
+                inventory.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_ID)));
+                inventory.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_QUANTITY)));
+                inventory.setCondition(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_CONDITION)));
+                inventory.setNotes(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_NOTES)));
+
+                // Поля из связанных таблиц
+                inventory.setItemName(cursor.getString(cursor.getColumnIndexOrThrow("item_name")));
+                inventory.setGroupName(cursor.getString(cursor.getColumnIndexOrThrow("group_name")));
+
+                // Даты
+                long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_CREATED_AT));
+                inventory.setCreatedAt(new Date(createdAt));
+
+                long updatedAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_UPDATED_AT));
+                inventory.setUpdatedAt(new Date(updatedAt));
+
+                inventoryList.add(inventory);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return inventoryList;
+    }
+
+    public List<InventoryItem> getAllInventoryItems() {
+        List<InventoryItem> items = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query = "SELECT ii.*, ig.name AS group_name " +
+                "FROM " + DbContract.InventoryItems.TABLE_NAME + " ii " +
+                "JOIN " + DbContract.InventoryGroups.TABLE_NAME + " ig " +
+                "ON ii." + DbContract.InventoryItems.COLUMN_GROUP_ID + " = ig." + DbContract.InventoryGroups.COLUMN_ID;
+
+        try (Cursor cursor = db.rawQuery(query, null)) {
+            while (cursor.moveToNext()) {
+                InventoryItem item = new InventoryItem();
+                item.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
+                item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
+                items.add(item);
+            }
+        }
+        return items;
+    }
+
+    public InventoryItem getInventoryItemById(long itemId) {
+        SQLiteDatabase db = getReadableDatabase();
+        InventoryItem item = null;
+
+        String query = "SELECT ii.*, ig.name AS group_name " +
+                "FROM " + DbContract.InventoryItems.TABLE_NAME + " ii " +
+                "JOIN " + DbContract.InventoryGroups.TABLE_NAME + " ig " +
+                "ON ii." + DbContract.InventoryItems.COLUMN_GROUP_ID + " = ig." + DbContract.InventoryGroups.COLUMN_ID + " " +
+                "WHERE ii." + DbContract.InventoryItems.COLUMN_ID + " = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(itemId)})) {
+            if (cursor.moveToFirst()) {
+                item = new InventoryItem();
+                item.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
+                item.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)));
+                item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
+            }
+        }
+        return item;
+    }
+
+    public List<WagonInventory> getWagonsForItem(long itemId) {
+        List<WagonInventory> wagons = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        String query = "SELECT wi.*, w.number AS wagon_number " +
+                "FROM " + DbContract.WagonInventory.TABLE_NAME + " wi " +
+                "JOIN " + DbContract.Wagons.TABLE_NAME + " w " +
+                "ON wi." + DbContract.WagonInventory.COLUMN_WAGON_ID + " = w." + DbContract.Wagons.COLUMN_ID + " " +
+                "WHERE wi." + DbContract.WagonInventory.COLUMN_ITEM_ID + " = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(itemId)})) {
+            while (cursor.moveToNext()) {
+                WagonInventory wagon = new WagonInventory();
+                wagon.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_UUID)));
+                wagon.setCondition(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_CONDITION)));
+                wagon.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_QUANTITY)));
+                wagons.add(wagon);
+            }
+        }
+        return wagons;
+    }
+
 
 }

@@ -15,7 +15,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
         android:elevation="4dp"
-        app:titleTextColor="@android:color/white">
+        android:titleTextColor="@android:color/white">
 
         <TextView
             android:id="@+id/tv_wagon_number"
@@ -37,8 +37,8 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
         android:visibility="gone"
-        app:backgroundTint="@color/colorPrimary"
-        app:tint="@android:color/white" />
+        android:backgroundTint="@color/colorPrimary"
+        android:tint="@android:color/white" />
 
     <!-- Список оборудования -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
