@@ -509,6 +509,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void clearAllTables() {
         SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("PRAGMA foreign_keys = OFF");
 
         db.execSQL("DELETE FROM " + DbContract.WagonInventory.TABLE_NAME);
         db.execSQL("DELETE FROM " + DbContract.InventoryItems.TABLE_NAME);
@@ -519,5 +520,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Сбрасываем автоинкремент
         db.execSQL("DELETE FROM sqlite_sequence");
+        db.execSQL("PRAGMA foreign_keys = ON");
+
+        db.close();//TODO: Возможно, нужно удалить
     }
 }

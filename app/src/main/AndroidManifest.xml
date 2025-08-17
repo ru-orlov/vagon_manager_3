@@ -7,14 +7,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-<!--    <activity-->
-<!--        android:name=".InventoryActivity"-->
-<!--        android:label="Весь инвентарь"-->
-<!--        android:parentActivityName=".MainActivity"/>-->
-<!--    <activity-->
-<!--        android:name=".InventoryDetailActivity"-->
-<!--        android:label="Детали оборудования"-->
-<!--        android:parentActivityName=".InventoryActivity"/>-->
 
     <application
         android:allowBackup="true"
@@ -34,6 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".HistoryActivity" />
+        <activity android:name=".InventoryActivity" />
+        <activity android:name=".InventoryDetailActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
