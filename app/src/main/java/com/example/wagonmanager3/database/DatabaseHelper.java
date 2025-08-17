@@ -98,6 +98,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public void deleteScanHistory(ScanHistory scanHistory) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(
+                DbContract.ScanHistory.TABLE_NAME,
+                DbContract.ScanHistory.COLUMN_UUID + " = ?",
+                new String[]{scanHistory.getUuid()}
+        );
+
+        // Логируем удаление
+        addChangeLog(
+                DbContract.ScanHistory.TABLE_NAME,
+                -1, // ID неизвестен
+                "delete",
+                scanHistory.toString(),
+                null
+        );
+    }
+
     public long addWagon(Wagon wagon) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = wagon.toContentValues();
