@@ -171,15 +171,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return groups;
     }
 
-
-
     public String getWagonNumberByUuid(String wagonUuid) {
         SQLiteDatabase db = this.getReadableDatabase();
         String number = null;
 
         Cursor cursor = db.query(
                 DbContract.Wagons.TABLE_NAME,
-                new String[]{DbContract.Wagons.COLUMN_NUMBER},
+                new String[]{DbContract.Wagons.COLUMN_UUID},
                 DbContract.Wagons.COLUMN_UUID + " = ?",
                 new String[]{wagonUuid},
                 null, null, null);
@@ -191,6 +189,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
 
         return number;
+    }
+
+    public List<InventoryGroup> getInventoryForWagon(String wagonId) {
+        List<InventoryGroup> groups = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        
+
+        return groups;
+    }
+
+    // Метод для обновления примечания
+    public void updateInventoryNotes(String wagonId, String notes) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("notes", notes);
+        db.update("wagons", values, "id = ?", new String[]{wagonId});
     }
 
     public void addScanHistory(ScanHistory historyItem) {
@@ -265,6 +279,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UUID)),
                     cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_VAGON_UUID)),
                     cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)),
                     cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)),
                     cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)),
@@ -297,7 +312,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Основные поля
             inventory.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_ID)));
             inventory.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_UUID)));
-            inventory.setWagonId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_WAGON_ID)));
+            inventory.setVagonUuid(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_WAGON_ID)));
             inventory.setItemId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_ITEM_ID)));
             inventory.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_QUANTITY)));
             inventory.setCondition(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.WagonInventory.COLUMN_CONDITION)));
@@ -319,7 +334,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Установка значений
         values.put(DbContract.WagonInventory.COLUMN_UUID, UUID.randomUUID().toString());
-        values.put(DbContract.WagonInventory.COLUMN_WAGON_ID, inventory.getWagonId());
+        values.put(DbContract.WagonInventory.COLUMN_WAGON_ID, inventory.getVagonUuid());
         values.put(DbContract.WagonInventory.COLUMN_ITEM_ID, inventory.getItemId());
         values.put(DbContract.WagonInventory.COLUMN_QUANTITY, inventory.getQuantity());
         values.put(DbContract.WagonInventory.COLUMN_CONDITION, inventory.getCondition());

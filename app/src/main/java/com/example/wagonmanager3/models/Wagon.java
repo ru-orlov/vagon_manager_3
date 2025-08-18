@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class Wagon {
     private long id;
-    private String uuid;
+    private String vagonUuid;
     private String number;
     private String type;
     private String vu9Number;
@@ -18,15 +18,16 @@ public class Wagon {
 
     // Конструкторы
     public Wagon() {
-        this.uuid = UUID.randomUUID().toString();
+        this.vagonUuid = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.syncStatus = "synced";
     }
 
-    public Wagon(String number, String type, String vu9Number, Date vu9Date) {
+    public Wagon(String number, String vagonUuid, String type, String vu9Number, Date vu9Date) {
         this();
         this.number = number;
+        this.vagonUuid = vagonUuid;
         this.type = type;
         this.vu9Number = vu9Number;
         this.vu9Date = vu9Date;
@@ -37,8 +38,8 @@ public class Wagon {
         return id;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getVagonUuid() {
+        return vagonUuid;
     }
 
     public String getNumber() {
@@ -74,8 +75,8 @@ public class Wagon {
         this.id = id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setVagonUuid(String vagonUuid) {
+        this.vagonUuid = vagonUuid;
     }
 
     public void setNumber(String number) {
@@ -122,7 +123,7 @@ public class Wagon {
     // Методы для работы с базой данных
     public android.content.ContentValues toContentValues() {
         android.content.ContentValues values = new android.content.ContentValues();
-        values.put(DbContract.Wagons.COLUMN_UUID, uuid);
+        values.put(DbContract.Wagons.COLUMN_UUID, vagonUuid);
         values.put(DbContract.Wagons.COLUMN_NUMBER, number);
         values.put(DbContract.Wagons.COLUMN_TYPE, type);
         values.put(DbContract.Wagons.COLUMN_VU_9_NUMBER, vu9Number);
@@ -138,7 +139,7 @@ public class Wagon {
     public static Wagon fromCursor(android.database.Cursor cursor) {
         Wagon wagon = new Wagon();
         wagon.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_ID)));
-        wagon.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_UUID)));
+        wagon.setVagonUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_UUID)));
         wagon.setNumber(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_NUMBER)));
         wagon.setType(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_TYPE)));
         wagon.setVu9Number(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_VU_9_NUMBER)));

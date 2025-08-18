@@ -62,6 +62,7 @@ public class DbContract {
         public static final String TABLE_NAME = "inventory_groups";
         public static final String COLUMN_ID = "id";
         public static final String COLUMN_UUID = "uuid";
+        public static final String COLUMN_VAGON_UUID = "vagonUuid";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_CREATED_AT = "created_at";
@@ -72,6 +73,7 @@ public class DbContract {
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_UUID + " TEXT UNIQUE NOT NULL,"
                 + COLUMN_NAME + " TEXT NOT NULL,"
+                + COLUMN_VAGON_UUID + " TEXT NOT NULL,"
                 + COLUMN_DESCRIPTION + " TEXT,"
                 + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_UPDATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
@@ -86,6 +88,7 @@ public class DbContract {
         public static final String COLUMN_ID = "id";
         public static final String COLUMN_UUID = "uuid";
         public static final String COLUMN_GROUP_ID = "group_id";
+        public static final String COLUMN_VAGON_UUID = "vagon_uuid";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_QUANTITY = "quantity";
@@ -97,6 +100,7 @@ public class DbContract {
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_UUID + " TEXT UNIQUE NOT NULL,"
                 + COLUMN_GROUP_ID + " INTEGER NOT NULL,"
+                + COLUMN_VAGON_UUID + " INTEGER NOT NULL,"
                 + COLUMN_NAME + " TEXT NOT NULL,"
                 + COLUMN_DESCRIPTION + " TEXT,"
                 + COLUMN_QUANTITY + " INTEGER DEFAULT 1,"

@@ -9,6 +9,7 @@ public class InventoryItem {
     private long id;
     private String uuid;
     private long groupId;
+    private String vagonUuid;
     private String name;
     private String description;
     private int quantity;
@@ -26,11 +27,20 @@ public class InventoryItem {
         // this.syncStatus = "NEW"; // Or whatever default makes sense
     }
 
-    public InventoryItem(long id, String uuid, long groupId, String name, String description,
+    public String getVagonUuid() {
+        return vagonUuid;
+    }
+
+    public void setVagonUuid(String vagonUuid) {
+        this.vagonUuid = vagonUuid;
+    }
+
+    public InventoryItem(long id, String uuid, long groupId, String vagonUuid, String name, String description,
                          int quantity, Date createdAt, Date updatedAt, String syncStatus) {
         this.id = id;
         this.uuid = uuid;
         this.groupId = groupId;
+        this.vagonUuid = vagonUuid;
         this.name = name;
         this.description = description;
         this.quantity = quantity;

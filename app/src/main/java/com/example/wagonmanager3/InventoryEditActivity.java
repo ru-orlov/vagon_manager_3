@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.example.wagonmanager3.database.DatabaseHelper;
-import com.example.wagonmanager3.database.DbContract;
 import com.example.wagonmanager3.models.WagonInventory;
 
 import java.io.File;
@@ -86,7 +85,7 @@ public class InventoryEditActivity extends AppCompatActivity {
                 etItemName.setText(inventory.getUuid());
                 etDescription.setText(inventory.getNotes());
                 etQuantity.setText(String.valueOf(inventory.getQuantity()));
-                actvGroup.setText((int) inventory.getWagonId());
+                actvGroup.setText((int) inventory.getVagonUuid());
                 actvCondition.setText(inventory.getCondition());
 
                 // Загрузка фото (если есть)

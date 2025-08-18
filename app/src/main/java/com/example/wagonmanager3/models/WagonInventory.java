@@ -5,7 +5,7 @@ import java.util.Date;
 public class WagonInventory {
     private long id;
     private String uuid;
-    private long wagonId;
+    private long vagonUuid;
     private long itemId;
     private int quantity;
     private String condition;
@@ -30,12 +30,12 @@ public class WagonInventory {
         this.uuid = uuid;
     }
 
-    public long getWagonId() {
-        return wagonId;
+    public long getVagonUuid() {
+        return vagonUuid;
     }
 
-    public void setWagonId(long wagonId) {
-        this.wagonId = wagonId;
+    public void setVagonUuid(long vagonUuid) {
+        this.vagonUuid = vagonUuid;
     }
 
     public long getItemId() {

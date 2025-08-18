@@ -125,7 +125,7 @@ public class InventoryDetailActivity extends AppCompatActivity {
             }
 
             public void bind(WagonInventory wagon) {
-                wagonNumber.setText((int) wagon.getWagonId());
+                wagonNumber.setText((int) wagon.getVagonUuid());
                 condition.setText(wagon.getCondition());
                 // Можно добавить цветовую индикацию состояния
             }
