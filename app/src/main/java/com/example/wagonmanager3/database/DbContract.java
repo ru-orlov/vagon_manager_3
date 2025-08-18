@@ -73,8 +73,8 @@ public class DbContract {
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_UUID + " TEXT UNIQUE NOT NULL,"
-                + COLUMN_NAME + " TEXT NOT NULL,"
+                + COLUMN_UUID + " TEXT,"
+                + COLUMN_NAME + " TEXT,"
                 + COLUMN_VAGON_UUID + " TEXT NOT NULL,"
                 + COLUMN_DESCRIPTION + " TEXT,"
                 + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"

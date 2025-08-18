@@ -95,8 +95,7 @@ public class DatabaseInitializer {
 
     private InventoryGroup createGroup(String name, String vagonUuid, String description) {
         InventoryGroup group = new InventoryGroup(name, vagonUuid, description);
-        long groupId = dbHelper.addInventoryGroup(group);
-        group.setId(groupId);
+        dbHelper.addInventoryGroup(group);
         return group;
     }
 
