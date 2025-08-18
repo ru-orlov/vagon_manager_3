@@ -123,7 +123,7 @@ public class Wagon {
     // Методы для работы с базой данных
     public android.content.ContentValues toContentValues() {
         android.content.ContentValues values = new android.content.ContentValues();
-        values.put(DbContract.Wagons.COLUMN_UUID, vagonUuid);
+        values.put(DbContract.Wagons.COLUMN_UUID, id == 0 ? vagonUuid : String.valueOf(id));
         values.put(DbContract.Wagons.COLUMN_NUMBER, number);
         values.put(DbContract.Wagons.COLUMN_TYPE, type);
         values.put(DbContract.Wagons.COLUMN_VU_9_NUMBER, vu9Number);
@@ -139,7 +139,7 @@ public class Wagon {
     public static Wagon fromCursor(android.database.Cursor cursor) {
         Wagon wagon = new Wagon();
         wagon.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_ID)));
-        wagon.setVagonUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_UUID)));
+        wagon.setVagonUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_VAGON_UUID)));
         wagon.setNumber(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_NUMBER)));
         wagon.setType(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_TYPE)));
         wagon.setVu9Number(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_VU_9_NUMBER)));

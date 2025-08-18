@@ -16,7 +16,6 @@ public class InventoryGroup {
     private String syncStatus;
 
     public InventoryGroup() {
-        this.uuid = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.syncStatus = "synced";

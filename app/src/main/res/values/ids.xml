@@ -7,4 +7,6 @@
     <item name="action_add_item" type="id"/>
     <item name="action_share_qr" type="id"/>
     <item name="empty_text" type="id"/>
+    <item name="textViewInventoryName" type="id"/>
+    <item name="textViewInventoryDescription" type="id"/>
 </resources>
