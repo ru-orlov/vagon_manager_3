@@ -68,13 +68,12 @@ public class QRCodeUtils {
                     hints
             );
 
-            // Конвертируем в Bitmap
-            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
-                }
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            int[] pixels = new int[width * height];
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = bitMatrix.get(i % width, i / width) ? Color.BLACK : Color.WHITE;
             }
+            bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
             return bitmap;
         } catch (WriterException e) {
             throw new WriterException("Ошибка генерации QR-кода: " + e.getMessage());

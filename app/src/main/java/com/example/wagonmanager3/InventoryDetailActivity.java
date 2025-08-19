@@ -64,16 +64,11 @@ public class InventoryDetailActivity extends AppCompatActivity {
         InventoryItem item = dbHelper.getInventoryItemById(itemId);
         if (item != null) {
             itemName.setText(item.getName());
-            itemGroup.setText((int) item.getGroupId());
+            itemGroup.setText(item.getGroupId());
             itemQuantity.setText(String.format("Количество: %d", item.getQuantity()));
             itemDescription.setText(item.getDescription());
             getSupportActionBar().setTitle(item.getName());
         }
-
-        // Загрузка списка вагонов
-        List<WagonInventory> wagons = dbHelper.getWagonsForItem(itemId);
-        WagonsAdapter adapter = new WagonsAdapter(wagons);
-        wagonsRecyclerView.setAdapter(adapter);
     }
 
     private void setupEditButton() {
@@ -90,45 +85,4 @@ public class InventoryDetailActivity extends AppCompatActivity {
         return true;
     }
 
-    private static class WagonsAdapter extends RecyclerView.Adapter<WagonsAdapter.ViewHolder> {
-        private final List<WagonInventory> wagons;
-
-        public WagonsAdapter(List<WagonInventory> wagons) {
-            this.wagons = wagons;
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_wagon_simple, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.bind(wagons.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return wagons.size();
-        }
-
-        static class ViewHolder extends RecyclerView.ViewHolder {
-            private final TextView wagonNumber;
-            private final TextView condition;
-
-            public ViewHolder(View itemView) {
-                super(itemView);
-                wagonNumber = itemView.findViewById(R.id.wagonNumber);
-                condition = itemView.findViewById(R.id.condition);
-            }
-
-            public void bind(WagonInventory wagon) {
-                wagonNumber.setText((int) wagon.getWagonId());
-                condition.setText(wagon.getCondition());
-                // Можно добавить цветовую индикацию состояния
-            }
-        }
-    }
 }

@@ -1,7 +1,6 @@
 package com.example.wagonmanager3.database;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.example.wagonmanager3.models.*;
 
@@ -22,41 +21,44 @@ public class DatabaseInitializer {
         User responsibleUser = createUser("responsible", "Ответственный", "responsible");
         User conductorUser = createUser("conductor", "Проводник Иванов", "conductor");
 
+        String wagon1Uuid = UUID.randomUUID().toString();
+        String wagon2Uuid = UUID.randomUUID().toString();
+        String wagon3Uuid = UUID.randomUUID().toString();
         // Добавляем группы инвентаря
-        InventoryGroup group1 = createGroup("Внутреннее оборудование", "Оборудование внутри вагона");
-        InventoryGroup group2 = createGroup("Электрооборудование", "Электрические компоненты");
-        InventoryGroup group3 = createGroup("Сантехника", "Сантехническое оборудование");
+        InventoryGroup group1 = createGroup(UUID.randomUUID().toString(),"Внутреннее оборудование", wagon1Uuid, "Оборудование внутри вагона");
+        InventoryGroup group11 = createGroup(UUID.randomUUID().toString(),"Внутреннее оборудование", wagon2Uuid, "Оборудование внутри вагона");
+        InventoryGroup group12 = createGroup(UUID.randomUUID().toString(),"Внутреннее оборудование", wagon3Uuid, "Оборудование внутри вагона");
+
+        InventoryGroup group2 = createGroup(UUID.randomUUID().toString(),"Электрооборудование", wagon1Uuid, "Электрические компоненты");
+        InventoryGroup group21 = createGroup(UUID.randomUUID().toString(),"Электрооборудование", wagon2Uuid, "Электрические компоненты");
+        InventoryGroup group22 = createGroup(UUID.randomUUID().toString(),"Электрооборудование", wagon3Uuid, "Электрические компоненты");
+
+        InventoryGroup group3 = createGroup(UUID.randomUUID().toString(),"Сантехника", wagon1Uuid, "Сантехническое оборудование");
+        InventoryGroup group31 = createGroup(UUID.randomUUID().toString(),"Сантехника", wagon2Uuid, "Сантехническое оборудование");
+        InventoryGroup group32 = createGroup(UUID.randomUUID().toString(),"Сантехника", wagon3Uuid, "Сантехническое оборудование");
 
         // Добавляем инвентарь для групп
-        List<InventoryItem> group1Items = createInternalEquipmentItems(group1.getId());
-        List<InventoryItem> group2Items = createElectricalEquipmentItems(group2.getId());
-        List<InventoryItem> group3Items = createPlumbingEquipmentItems(group3.getId());
+        createInternalEquipmentItems(group1.getUuid(), wagon1Uuid);
+        createElectricalEquipmentItems(group2.getUuid(), wagon2Uuid);
+        createPlumbingEquipmentItems(group3.getUuid(), wagon3Uuid);
 
-        // Создаем 3 вагона с инвентарем
-        Wagon wagon1 = createWagonWithInventory("123456", "Купе", "VU-123",
-                group1Items, group2Items, group3Items);
-        Wagon wagon2 = createWagonWithInventory("654321", "Плацкарт", "VU-456",
-                group1Items, group2Items, group3Items);
-        Wagon wagon3 = createWagonWithInventory("987654", "СВ", "VU-789",
-                group1Items, group2Items, group3Items);
+        createPlumbingEquipmentItems(group11.getUuid(), wagon2Uuid);
+        createPlumbingEquipmentItems(group12.getUuid(), wagon3Uuid);
+        createPlumbingEquipmentItems(group21.getUuid(), wagon2Uuid);
+        createPlumbingEquipmentItems(group22.getUuid(), wagon3Uuid);
+        createPlumbingEquipmentItems(group31.getUuid(), wagon2Uuid);
+        createPlumbingEquipmentItems(group32.getUuid(), wagon3Uuid);
 
-        // Добавляем по одному сканированию для каждого вагона
+
+
+        Wagon wagon1 = createWagon("Вагон 1321", wagon1Uuid, "Пассажирский");
+        Wagon wagon2 = createWagon("Вагон 2495", wagon2Uuid, "Пассажирский");
+        Wagon wagon3 = createWagon("Вагон 3753", wagon3Uuid, "Грузовой");
+
+//        // Добавляем по одному сканированию для каждого вагона
         createSingleScanHistory(wagon1, conductorUser);
         createSingleScanHistory(wagon2, conductorUser);
         createSingleScanHistory(wagon3, responsibleUser);
-    }
-
-    private Wagon createWagonWithInventory(String number, String type, String vu9Number,
-                                           List<InventoryItem> group1Items,
-                                           List<InventoryItem> group2Items,
-                                           List<InventoryItem> group3Items) {
-        // Создаем вагон
-        Wagon wagon = createWagon(number, type, vu9Number, new Date());
-
-        // Добавляем инвентарь в вагон
-        addInventoryToWagon(wagon, group1Items, group2Items, group3Items);
-
-        return wagon;
     }
 
     private void createSingleScanHistory(Wagon wagon, User user) {
@@ -84,50 +86,50 @@ public class DatabaseInitializer {
         return user;
     }
 
-    private Wagon createWagon(String number, String type, String vu9Number, Date vu9Date) {
-        Wagon wagon = new Wagon(number, type, vu9Number, vu9Date);
+    private Wagon createWagon(String number, String vagonUuid, String type) {
+        Wagon wagon = new Wagon(number, vagonUuid, type);
         dbHelper.addWagon(wagon);
         return wagon;
     }
 
-    private InventoryGroup createGroup(String name, String description) {
-        InventoryGroup group = new InventoryGroup(name, description);
-        long groupId = dbHelper.addInventoryGroup(group);
-        group.setId(groupId);
+    private InventoryGroup createGroup(String uuid, String name, String vagonUuid, String description) {
+        InventoryGroup group = new InventoryGroup(uuid, name, vagonUuid, description);
+        dbHelper.addInventoryGroup(group);
         return group;
     }
 
-    private List<InventoryItem> createInternalEquipmentItems(long groupId) {
+    private List<InventoryItem> createInternalEquipmentItems(String groupId, String vagonUuid) {
         List<InventoryItem> items = new ArrayList<>();
-        items.add(createItem(groupId, "Спинки поролоновые", "", 56));
-        items.add(createItem(groupId, "Зеркала", "", 40));
-        items.add(createItem(groupId, "Автошторы", "", 16));
-        items.add(createItem(groupId, "Поручни оконные", "", 12));
-        items.add(createItem(groupId, "Стул поворотный (откидной)", "", 8));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Спинки поролоновые", vagonUuid, "Описание", 56));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Зеркала", vagonUuid, "Описание", 40));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Автошторы", vagonUuid, "Описание",16));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Поручни оконные", vagonUuid, "Описание",12));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Стул поворотный (откидной)", vagonUuid, "Описание",8));
         return items; // Оставим только 5 элементов для каждого типа
     }
 
-    private List<InventoryItem> createElectricalEquipmentItems(long groupId) {
+    private List<InventoryItem> createElectricalEquipmentItems(String groupId, String vagonUuid) {
         List<InventoryItem> items = new ArrayList<>();
-        items.add(createItem(groupId, "Высоковольтная магистраль", "", 8));
-        items.add(createItem(groupId, "Розетка высоковольтная", "", 12));
-        items.add(createItem(groupId, "Электрощит (комплект)", "", 2));
-        items.add(createItem(groupId, "Плафоны круглые", "", 18));
-        items.add(createItem(groupId, "Видеорегистратор", "", 2));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Высоковольтная магистраль",vagonUuid, "Описание", 8));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Розетка высоковольтная", vagonUuid,"Описание", 12));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Электрощит (комплект)", vagonUuid,"Описание", 2));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Плафоны круглые", vagonUuid,"Описание", 18));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Видеорегистратор", vagonUuid,"Описание", 2));
         return items;
     }
 
-    private List<InventoryItem> createPlumbingEquipmentItems(long groupId) {
+    private List<InventoryItem> createPlumbingEquipmentItems(String groupId, String vagonUuid) {
         List<InventoryItem> items = new ArrayList<>();
-        items.add(createItem(groupId, "Унитаз в сборе", "", 3));
-        items.add(createItem(groupId, "Шланг для душа", "", 1));
-        items.add(createItem(groupId, "Вкладыш диванный", "", 6));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Унитаз в сборе", vagonUuid, "Описание", 3));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Шланг для душа", vagonUuid, "Описание", 1));
+        items.add(createItem(UUID.randomUUID().toString(), groupId, "Вкладыш диванный", vagonUuid, "Описание", 6));
         return items;
     }
 
-    private InventoryItem createItem(long groupId, String name, String description, int quantity) {
+    private InventoryItem createItem(String uuid, String groupId, String name, String vagonUuid, String description, int quantity) {
         InventoryItem item = new InventoryItem(
-                UUID.randomUUID().toString(),
+                uuid,
+                vagonUuid,
                 groupId,
                 name,
                 description,
@@ -139,21 +141,4 @@ public class DatabaseInitializer {
         return item;
     }
 
-    private void addInventoryToWagon(Wagon wagon, List<InventoryItem>... itemGroups) {
-        String[] conditions = {"Отличное", "Хорошее", "Требует ремонта"};
-        Random random = new Random();
-
-        for (List<InventoryItem> group : itemGroups) {
-            for (InventoryItem item : group) {
-                WagonInventory wagonInventory = new WagonInventory();
-                wagonInventory.setWagonId(wagon.getId());
-                wagonInventory.setItemId(item.getId());
-                wagonInventory.setQuantity(item.getQuantity());
-                wagonInventory.setCondition(conditions[random.nextInt(conditions.length)]);
-                wagonInventory.setNotes("Примечание для " + item.getName());
-
-                dbHelper.addWagonInventory(wagonInventory);
-            }
-        }
-    }
 }

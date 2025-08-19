@@ -8,6 +8,7 @@ import java.util.UUID;
 public class InventoryGroup {
     private long id;
     private String uuid;
+    private String vagonUuid;
     private String name;
     private String description;
     private Date createdAt;
@@ -15,15 +16,16 @@ public class InventoryGroup {
     private String syncStatus;
 
     public InventoryGroup() {
-        this.uuid = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.syncStatus = "synced";
     }
 
-    public InventoryGroup(String name, String description) {
+    public InventoryGroup(String uuid, String name, String vagonUuid, String description) {
         this();
+        this.uuid = uuid;
         this.name = name;
+        this.vagonUuid = vagonUuid;
         this.description = description;
     }
 
@@ -75,6 +77,14 @@ public class InventoryGroup {
         this.updatedAt = new Date();
     }
 
+    public String getVagonUuid() {
+        return vagonUuid;
+    }
+
+    public void setVagonUuid(String vagonUuid) {
+        this.vagonUuid = vagonUuid;
+    }
+
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -96,6 +106,7 @@ public class InventoryGroup {
     public android.content.ContentValues toContentValues() {
         android.content.ContentValues values = new android.content.ContentValues();
         values.put(DbContract.InventoryGroups.COLUMN_UUID, uuid);
+        values.put(DbContract.InventoryGroups.COLUMN_UUID, uuid);
         values.put(DbContract.InventoryGroups.COLUMN_NAME, name);
         values.put(DbContract.InventoryGroups.COLUMN_DESCRIPTION, description);
         values.put(DbContract.InventoryGroups.COLUMN_CREATED_AT, createdAt.getTime());
@@ -109,6 +120,7 @@ public class InventoryGroup {
         InventoryGroup group = new InventoryGroup();
         group.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryGroups.COLUMN_ID)));
         group.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryGroups.COLUMN_UUID)));
+        group.setVagonUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryGroups.COLUMN_VAGON_UUID)));
         group.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryGroups.COLUMN_NAME)));
         group.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryGroups.COLUMN_DESCRIPTION)));
 

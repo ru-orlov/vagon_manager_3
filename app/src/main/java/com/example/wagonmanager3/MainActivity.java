@@ -2,8 +2,6 @@ package com.example.wagonmanager3;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -17,7 +15,6 @@ import com.example.wagonmanager3.adapters.ScanHistoryAdapter;
 import com.example.wagonmanager3.database.DatabaseHelper;
 import com.example.wagonmanager3.database.DatabaseInitializer;
 import com.example.wagonmanager3.models.ScanHistory;
-import androidx.appcompat.widget.Toolbar;
 
 
 import java.util.ArrayList;
@@ -92,20 +89,9 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
     }
 
     private void showEditDialog(ScanHistory scanHistory) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Редактирование записи");
-
-        View view = getLayoutInflater().inflate(R.layout.dialog_edit_scan, null);
-        EditText etNotes = view.findViewById(R.id.et_notes);
-
-        builder.setView(view);
-        builder.setPositiveButton("Сохранить", (dialog, which) -> {
-            // Здесь можно добавить логику сохранения изменений
-            Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_SHORT).show();
-        });
-        builder.setNegativeButton("Отмена", null);
-
-        builder.show();
+        Intent intent = new Intent(this, WagonInventoryActivity.class);
+        intent.putExtra("WagonUuid", scanHistory.getWagonUuid());
+        startActivity(intent);
     }
 
     private void showDeleteDialog(ScanHistory scanHistory) {
