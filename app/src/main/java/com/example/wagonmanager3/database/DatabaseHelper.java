@@ -156,8 +156,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             number = cursor.getString(0);
         }
         cursor.close();
-
         return number;
+    }
+
+    public Wagon getWagonByUuid(String wagonUuid) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Wagon wagon = null;
+
+        Cursor cursor = db.query(
+                DbContract.Wagons.TABLE_NAME,
+                null,
+                DbContract.Wagons.COLUMN_UUID + " = ?",
+                new String[]{wagonUuid},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            wagon = new Wagon(
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_NUMBER)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_UUID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_TYPE))
+            );
+        }
+        cursor.close();
+        return wagon;
     }
 
 

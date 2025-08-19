@@ -31,11 +31,7 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
             // ВНИМАНИЕ: сравнивать groupId и group.getUuid() (или getId()), зависит от вашей модели!
             List<InventoryItem> groupItems = new ArrayList<>();
             for (InventoryItem item : items) {
-                // Обычно groupId в InventoryItem — это id из InventoryGroup, а не uuid!
-                // Исправьте строку ниже, если нужно сравнивать id (long) или uuid (String)
-                // Например, если groupId (Long) и group.getId() (Long):
-                if (String.valueOf(item.getGroupId()).equals(String.valueOf(group.getId()))
-                        || String.valueOf(item.getGroupId()).equals(group.getUuid())
+                if (String.valueOf(item.getGroupId()).equals(group.getUuid())
                 ) {
                     groupItems.add(item);
                 }

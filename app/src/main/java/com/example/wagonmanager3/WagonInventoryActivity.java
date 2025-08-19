@@ -14,6 +14,7 @@ import com.example.wagonmanager3.adapters.InventorySectionAdapter;
 import com.example.wagonmanager3.database.DatabaseHelper;
 import com.example.wagonmanager3.models.InventoryGroup;
 import com.example.wagonmanager3.models.InventoryItem;
+import com.example.wagonmanager3.models.Wagon;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class WagonInventoryActivity extends AppCompatActivity {
         String wagonUuid = getIntent().getStringExtra("WagonUuid");
 
         // Теперь вызов getSupportActionBar() безопасен:
-        getSupportActionBar().setTitle("Инвентарь вагона " + wagonUuid);
+        getSupportActionBar().setTitle("Инвентарь вагона " + getWagonNumber(wagonUuid));
 
         List<InventoryItem> inventoryItems = loadInventoryList(wagonUuid);
         List<InventoryGroup> inventoryGroups = loadInventoryGroupList(wagonUuid);
@@ -50,7 +51,8 @@ public class WagonInventoryActivity extends AppCompatActivity {
 
     private String getWagonNumber(String wagonUuid) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        return dbHelper.getWagonNumberByUuid(wagonUuid);
+        Wagon wagon = dbHelper.getWagonByUuid(wagonUuid);
+        return wagon.getNumber();
     }
     private void setupRecyclerView() {
         inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
