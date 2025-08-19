@@ -26,13 +26,30 @@ public class DatabaseInitializer {
         String wagon3Uuid = UUID.randomUUID().toString();
         // Добавляем группы инвентаря
         InventoryGroup group1 = createGroup(UUID.randomUUID().toString(),"Внутреннее оборудование", wagon1Uuid, "Оборудование внутри вагона");
-        InventoryGroup group2 = createGroup(UUID.randomUUID().toString(),"Электрооборудование", wagon2Uuid, "Электрические компоненты");
-        InventoryGroup group3 = createGroup(UUID.randomUUID().toString(),"Сантехника", wagon3Uuid, "Сантехническое оборудование");
+        InventoryGroup group11 = createGroup(UUID.randomUUID().toString(),"Внутреннее оборудование", wagon2Uuid, "Оборудование внутри вагона");
+        InventoryGroup group12 = createGroup(UUID.randomUUID().toString(),"Внутреннее оборудование", wagon3Uuid, "Оборудование внутри вагона");
+
+        InventoryGroup group2 = createGroup(UUID.randomUUID().toString(),"Электрооборудование", wagon1Uuid, "Электрические компоненты");
+        InventoryGroup group21 = createGroup(UUID.randomUUID().toString(),"Электрооборудование", wagon2Uuid, "Электрические компоненты");
+        InventoryGroup group22 = createGroup(UUID.randomUUID().toString(),"Электрооборудование", wagon3Uuid, "Электрические компоненты");
+
+        InventoryGroup group3 = createGroup(UUID.randomUUID().toString(),"Сантехника", wagon1Uuid, "Сантехническое оборудование");
+        InventoryGroup group31 = createGroup(UUID.randomUUID().toString(),"Сантехника", wagon2Uuid, "Сантехническое оборудование");
+        InventoryGroup group32 = createGroup(UUID.randomUUID().toString(),"Сантехника", wagon3Uuid, "Сантехническое оборудование");
 
         // Добавляем инвентарь для групп
         createInternalEquipmentItems(group1.getUuid(), wagon1Uuid);
         createElectricalEquipmentItems(group2.getUuid(), wagon2Uuid);
         createPlumbingEquipmentItems(group3.getUuid(), wagon3Uuid);
+
+        createPlumbingEquipmentItems(group11.getUuid(), wagon2Uuid);
+        createPlumbingEquipmentItems(group12.getUuid(), wagon3Uuid);
+        createPlumbingEquipmentItems(group21.getUuid(), wagon2Uuid);
+        createPlumbingEquipmentItems(group22.getUuid(), wagon3Uuid);
+        createPlumbingEquipmentItems(group31.getUuid(), wagon2Uuid);
+        createPlumbingEquipmentItems(group32.getUuid(), wagon3Uuid);
+
+
 
         Wagon wagon1 = createWagon("Вагон 1321", wagon1Uuid, "Пассажирский");
         Wagon wagon2 = createWagon("Вагон 2495", wagon2Uuid, "Пассажирский");
