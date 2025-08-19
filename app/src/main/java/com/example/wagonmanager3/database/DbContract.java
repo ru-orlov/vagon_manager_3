@@ -119,34 +119,6 @@ public class DbContract {
                 + "ON " + TABLE_NAME + "(" + COLUMN_SYNC_STATUS + ")";
     }
 
-    // Таблица инвентаря вагона
-    public static class WagonInventory {
-        public static final String TABLE_NAME = "wagon_inventory";
-        public static final String COLUMN_ID = "id";
-        public static final String COLUMN_UUID = "uuid";
-        public static final String COLUMN_WAGON_ID = "wagon_id";
-        public static final String COLUMN_ITEM_ID = "item_id";
-        public static final String COLUMN_QUANTITY = "quantity";
-        public static final String COLUMN_CONDITION = "condition";
-        public static final String COLUMN_NOTES = "notes";
-        public static final String COLUMN_CREATED_AT = "created_at";
-        public static final String COLUMN_UPDATED_AT = "updated_at";
-        public static final String COLUMN_SYNC_STATUS = "sync_status";
-
-        public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
-                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_UUID + " TEXT NOT NULL,"
-                + COLUMN_WAGON_ID + " INTEGER NOT NULL,"
-                + COLUMN_ITEM_ID + " INTEGER NOT NULL,"
-                + COLUMN_QUANTITY + " INTEGER NOT NULL DEFAULT 1,"
-                + COLUMN_CONDITION + " TEXT NOT NULL,"
-                + COLUMN_NOTES + " TEXT,"
-                + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                + COLUMN_UPDATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted'))"
-                + ")";
-    }
-
     // Таблица истории сканирований
     public static class ScanHistory {
         public static final String TABLE_NAME = "scan_history";

@@ -11,8 +11,6 @@ public class Wagon {
     private String vagonUuid;
     private String number;
     private String type;
-    private String vu9Number;
-    private Date vu9Date;
     private Date createdAt;
     private Date updatedAt;
     private String syncStatus;
@@ -33,13 +31,11 @@ public class Wagon {
         this.syncStatus = "synced";
     }
 
-    public Wagon(String number, String vagonUuid, String type, String vu9Number, Date vu9Date) {
+    public Wagon(String number, String vagonUuid, String type) {
         this();
         this.number = number;
         this.vagonUuid = vagonUuid;
         this.type = type;
-        this.vu9Number = vu9Number;
-        this.vu9Date = vu9Date;
     }
 
     // Геттеры
@@ -59,15 +55,7 @@ public class Wagon {
         return type;
     }
 
-    public String getVu9Number() {
-        return vu9Number;
-    }
-
-    public Date getVu9Date() {
-        return vu9Date;
-    }
-
-    public Date getCreatedAt() {
+     public Date getCreatedAt() {
         return createdAt;
     }
 
@@ -98,16 +86,6 @@ public class Wagon {
         this.updatedAt = new Date();
     }
 
-    public void setVu9Number(String vu9Number) {
-        this.vu9Number = vu9Number;
-        this.updatedAt = new Date();
-    }
-
-    public void setVu9Date(Date vu9Date) {
-        this.vu9Date = vu9Date;
-        this.updatedAt = new Date();
-    }
-
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -135,10 +113,6 @@ public class Wagon {
         values.put(DbContract.Wagons.COLUMN_UUID, id == 0 ? vagonUuid : String.valueOf(id));
         values.put(DbContract.Wagons.COLUMN_NUMBER, number);
         values.put(DbContract.Wagons.COLUMN_TYPE, type);
-        values.put(DbContract.Wagons.COLUMN_VU_9_NUMBER, vu9Number);
-        if (vu9Date != null) {
-            values.put(DbContract.Wagons.COLUMN_VU_9_DATE, vu9Date.getTime());
-        }
         values.put(DbContract.Wagons.COLUMN_CREATED_AT, createdAt.getTime());
         values.put(DbContract.Wagons.COLUMN_UPDATED_AT, updatedAt.getTime());
         values.put(DbContract.Wagons.COLUMN_SYNC_STATUS, syncStatus);
@@ -151,12 +125,6 @@ public class Wagon {
         wagon.setVagonUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_VAGON_UUID)));
         wagon.setNumber(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_NUMBER)));
         wagon.setType(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_TYPE)));
-        wagon.setVu9Number(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_VU_9_NUMBER)));
-
-        long vu9DateMillis = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_VU_9_DATE));
-        if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_VU_9_DATE))) {
-            wagon.setVu9Date(new Date(vu9DateMillis));
-        }
 
         long createdAtMillis = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_CREATED_AT));
         wagon.setCreatedAt(new Date(createdAtMillis));

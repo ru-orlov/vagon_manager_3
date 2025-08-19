@@ -79,21 +79,7 @@ public class InventoryEditActivity extends AppCompatActivity {
         if (inventoryId != -1) {
             // Редактирование существующего элемента
             DatabaseHelper dbHelper = new DatabaseHelper(this);
-            WagonInventory inventory = dbHelper.getWagonInventoryById(inventoryId);
 
-            if (inventory != null) {
-                etItemName.setText(inventory.getUuid());
-                etDescription.setText(inventory.getNotes());
-                etQuantity.setText(String.valueOf(inventory.getQuantity()));
-                actvGroup.setText((int) inventory.getVagonUuid());
-                actvCondition.setText(inventory.getCondition());
-
-                // Загрузка фото (если есть)
-//                if (inventory.getPhotoPath() != null && !inventory.getPhotoPath().isEmpty()) {
-//                    ivPhoto.setImageURI(Uri.parse(inventory.getPhotoPath()));
-//                    findViewById(R.id.btn_remove_photo).setVisibility(View.VISIBLE);
-//                }
-            }
         }
     }
 
@@ -133,25 +119,7 @@ public class InventoryEditActivity extends AppCompatActivity {
         }
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        WagonInventory inventory = new WagonInventory();
-        //inventory.setUuid(name);
-        inventory.setUuid(wagonUuid);
-        inventory.setNotes(description);
-        inventory.setQuantity(quantity);
-        //inventory.setGroupName(group);
-        inventory.setCondition(condition);
-       // inventory.setPhotoPath(currentPhotoPath);
 
-        if (inventoryId == -1) {
-            // Добавление нового элемента
-            dbHelper.addWagonInventory(inventory);
-            Toast.makeText(this, "Оборудование добавлено", Toast.LENGTH_SHORT).show();
-        } else {
-            // Обновление существующего
-            inventory.setId(inventoryId);
-            dbHelper.updateWagonInventory(inventory);
-            Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_SHORT).show();
-        }
 
         finish();
     }

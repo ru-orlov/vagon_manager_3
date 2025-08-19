@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.wagonmanager3.database.DatabaseHelper;
 import com.example.wagonmanager3.database.DbContract;
 import com.example.wagonmanager3.adapters.InventoryAdapter;
+import com.example.wagonmanager3.models.InventoryGroup;
+import com.example.wagonmanager3.models.InventoryItem;
 import com.example.wagonmanager3.models.WagonInventory;
 import com.example.wagonmanager3.utils.QRCodeUtils;
 import com.example.wagonmanager3.models.User;
@@ -40,14 +42,17 @@ public class WagonInventoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wagon_inventory);
 
         // Получаем данные вагона
-        wagonUuid = getIntent().getStringExtra("wagon_uuid");
+        wagonUuid = getIntent().getStringExtra("WagonUuid");
         wagonNumber = getWagonNumber(wagonUuid);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-       // setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Инвентарь вагона " + wagonNumber);
-        inventoryRecyclerView = findViewById(R.id.inventory_list);
-        inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        loadInventoryData();
+        List<InventoryItem> items = loadInventoryList();
+        List<InventoryGroup> groups = loadInventoryGroupList();
+
+
+
+        //inventoryRecyclerView = findViewById(R.id.inventory_list);
+        //inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //loadInventoryData();
     }
 
     private String getWagonNumber(String wagonUuid) {
@@ -58,28 +63,25 @@ public class WagonInventoryActivity extends AppCompatActivity {
         inventoryList.setLayoutManager(new LinearLayoutManager(this));
         inventoryList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
-
-    private void loadInventoryData() {
+    private List<InventoryItem> loadInventoryList() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        List<WagonInventory> inventory = dbHelper.getWagonInventory(wagonUuid);
+        return dbHelper.getInventoryItemsByWagonUuid(wagonUuid);
+    }
 
-        if (inventory.isEmpty()) {
-            showEmptyState();
-        } else {
-           // adapter = new InventoryAdapter(inventory);
-            inventoryRecyclerView.setAdapter(adapter);
-        }
+    private List<InventoryGroup> loadInventoryGroupList() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        return dbHelper.getInventoryGroupByWagonUuid(wagonUuid);
     }
     private void showEmptyState() {
         // Показать состояние "пусто"
-        TextView emptyText = findViewById(R.id.empty_text);
-        emptyText.setVisibility(View.VISIBLE);
-        inventoryRecyclerView.setVisibility(View.GONE);
+//        TextView emptyText = findViewById(R.string.empty_text);
+//        emptyText.setVisibility(View.VISIBLE);
+//        inventoryRecyclerView.setVisibility(View.GONE);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_wagon_inventory, menu);
+        //getMenuInflater().inflate(R.menu.menu_wagon_inventory, menu);
         return true;
     }
 
@@ -87,13 +89,13 @@ public class WagonInventoryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_add_item) {
-            openAddInventoryItem();
-            return true;
-        } else if (id == R.id.action_share_qr) {
-            shareWagonQr();
-            return true;
-        }
+//        if (id == R.id.action_add_item) {
+//            openAddInventoryItem();
+//            return true;
+//        } else if (id == R.id.action_share_qr) {
+//            shareWagonQr();
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }

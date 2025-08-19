@@ -41,4 +41,5 @@
     <string name="share_qr">Поделиться QR</string>
     <string name="arrow_icon">Стрелка</string>
     <string name="scan_history">История сканирований</string>
+    <string name="empty_text">Нет записей...</string>
 </resources>

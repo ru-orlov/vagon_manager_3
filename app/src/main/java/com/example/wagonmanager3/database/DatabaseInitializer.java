@@ -33,26 +33,15 @@ public class DatabaseInitializer {
         createInternalEquipmentItems(group1.getUuid(), wagon1Uuid);
         createElectricalEquipmentItems(group2.getUuid(), wagon2Uuid);
         createPlumbingEquipmentItems(group3.getUuid(), wagon3Uuid);
-//
-//
+
+        Wagon wagon1 = createWagon("Вагон 1321", wagon1Uuid, "Пассажирский");
+        Wagon wagon2 = createWagon("Вагон 2495", wagon2Uuid, "Пассажирский");
+        Wagon wagon3 = createWagon("Вагон 3753", wagon3Uuid, "Грузовой");
 
 //        // Добавляем по одному сканированию для каждого вагона
-//        createSingleScanHistory(wagon1, conductorUser);
-//        createSingleScanHistory(wagon2, conductorUser);
-//        createSingleScanHistory(wagon3, responsibleUser);
-    }
-
-    private Wagon createWagonWithInventory(String number, String vagonUuid, String type, String vu9Number,
-                                           List<InventoryItem> group1Items,
-                                           List<InventoryItem> group2Items,
-                                           List<InventoryItem> group3Items) {
-        // Создаем вагон
-        Wagon wagon = createWagon(number, vagonUuid, type, vu9Number, new Date());
-
-        // Добавляем инвентарь в вагон
-        addInventoryToWagon(wagon, group1Items, group2Items, group3Items);
-
-        return wagon;
+        createSingleScanHistory(wagon1, conductorUser);
+        createSingleScanHistory(wagon2, conductorUser);
+        createSingleScanHistory(wagon3, responsibleUser);
     }
 
     private void createSingleScanHistory(Wagon wagon, User user) {
@@ -80,8 +69,8 @@ public class DatabaseInitializer {
         return user;
     }
 
-    private Wagon createWagon(String number, String vagonUuid, String type, String vu9Number, Date vu9Date) {
-        Wagon wagon = new Wagon(number, vagonUuid, type, vu9Number, vu9Date);
+    private Wagon createWagon(String number, String vagonUuid, String type) {
+        Wagon wagon = new Wagon(number, vagonUuid, type);
         dbHelper.addWagon(wagon);
         return wagon;
     }
@@ -135,21 +124,4 @@ public class DatabaseInitializer {
         return item;
     }
 
-    private void addInventoryToWagon(Wagon wagon, List<InventoryItem>... itemGroups) {
-        String[] conditions = {"Отличное", "Хорошее", "Требует ремонта"};
-        Random random = new Random();
-
-        for (List<InventoryItem> group : itemGroups) {
-            for (InventoryItem item : group) {
-                WagonInventory wagonInventory = new WagonInventory();
-                wagonInventory.setVagonUuid(wagon.getId());
-                wagonInventory.setItemId(item.getId());
-                wagonInventory.setQuantity(item.getQuantity());
-                wagonInventory.setCondition(conditions[random.nextInt(conditions.length)]);
-                wagonInventory.setNotes("Примечание для " + item.getName());
-
-                dbHelper.addWagonInventory(wagonInventory);
-            }
-        }
-    }
 }

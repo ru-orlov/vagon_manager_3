@@ -100,53 +100,9 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
     }
 
     private void showEditDialog(ScanHistory scanHistory) {
-        List<InventoryGroup> allInventoryGroup = dbHelper.getAllInventoryGroups();
-        List<InventoryItem> allInventoryItems = dbHelper.getAllInventoryItems();
-        List<ScanHistory> allScanned = dbHelper.getAllScanHistory();
-        List<Wagon> allWagons = dbHelper.getAllWagons();
-
-        List<InventoryGroup> inventoryGroup = dbHelper.getInventoryGroupByWagonUuid(scanHistory.getWagonUuid());
-        List<InventoryItem> inventoryItems = dbHelper.getInventoryItemsByWagonUuid(scanHistory.getWagonUuid());
-
-        List<InventoryTableRow> tableRows = new ArrayList<>();
-        for (InventoryGroup group : inventoryGroup) {
-            for (InventoryItem item : inventoryItems) {
-                if (item.getGroupId().equals(group.getUuid())) {
-                    tableRows.add(new InventoryTableRow(
-                            group.getName(),
-                            item.getName(),
-                            item.getQuantity()));
-                }
-            }
-        }
-
-        System.out.println(">>> showEditDialog: " + tableRows.size() + " rows found for wagon " + scanHistory.getWagonUuid());
-        // Создаём диалог с кастомным layout
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_wagon, null);
-        RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerViewInventory);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new InventoryTableAdapter(tableRows));
-
-        new AlertDialog.Builder(this)
-        .setView(dialogView)
-        .setCancelable(true)
-        .show();
-
-
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Редактирование записи");
-//
-//        View view = getLayoutInflater().inflate(R.layout.dialog_edit_scan, null);
-//        EditText etNotes = view.findViewById(R.id.et_notes);
-//
-//        builder.setView(view);
-//        builder.setPositiveButton("Сохранить", (dialog, which) -> {
-//            // Здесь можно добавить логику сохранения изменений
-//            Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_SHORT).show();
-//        });
-//        builder.setNegativeButton("Отмена", null);
-//
-//        builder.show();
+        Intent intent = new Intent(this, WagonInventoryActivity.class);
+        intent.putExtra("WagonUuid", scanHistory.getWagonUuid());
+        startActivity(intent);
     }
 
     private void showDeleteDialog(ScanHistory scanHistory) {
