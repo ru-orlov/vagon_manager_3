@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -13,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wagonmanager3.adapters.ScanHistoryAdapter;
 import com.example.wagonmanager3.database.DatabaseHelper;
-import com.example.wagonmanager3.database.DatabaseInitializer;
+//import com.example.wagonmanager3.database.DatabaseInitializer;
 import com.example.wagonmanager3.models.ScanHistory;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 
 import java.util.ArrayList;
@@ -25,6 +28,17 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
     private ScanHistoryAdapter adapter;
     private DatabaseHelper dbHelper;
 
+    private final ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(
+            new ScanContract(),
+            result -> {
+                if (result.getContents() != null) {
+                    String vagonUuid = result.getContents();
+                    Intent intent = new Intent(this, WagonInventoryActivity.class);
+                    intent.putExtra("WagonUuid", vagonUuid);
+                    startActivity(intent);
+                }
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +47,21 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
         dbHelper = new DatabaseHelper(this);
 
         // Инициализация тестовых данных
-        new DatabaseInitializer(this).initializeTestData();
-        System.out.println(">>> onCreate");
+        //new DatabaseInitializer(this).initializeTestData();
+
         setupToolbar();
         setupRecyclerView();
         loadScanHistory();
+
+        ImageButton btnScan = findViewById(R.id.btn_scan);
+        btnScan.setOnClickListener(v -> {
+            ScanOptions options = new ScanOptions();
+            options.setPrompt("Наведите камеру на QR-код вагона");
+            options.setOrientationLocked(false);
+            options.setBeepEnabled(false);
+            options.setBarcodeImageEnabled(true);
+            barcodeLauncher.launch(options);
+        });
     }
 
     private void setupToolbar() {
@@ -50,11 +74,20 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
             getSupportActionBar().setTitle("Журнал ВУ-9");
         }
 
-        ImageButton btnScan = findViewById(R.id.btn_scan);
-        btnScan.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ScanActivity.class);
-            startActivity(intent);
-        });
+//        ImageButton btnScan = findViewById(R.id.btn_scan);
+//        btnScan.setOnClickListener(v -> {
+//            Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+//            startActivity(intent);
+//        });
+    }
+    private void showWagonNotFoundAndReturn() {
+        // Можно использовать Toast, Snackbar или AlertDialog — вот пример с Toast
+        Toast.makeText(this, "Вагон не найден", Toast.LENGTH_LONG).show();
+        // Если вы уже на главном экране — можно ничего не делать, иначе:
+        // Если вы хотите всегда возвращаться на главный экран:
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
     }
 
 

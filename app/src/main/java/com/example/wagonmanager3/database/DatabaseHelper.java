@@ -43,8 +43,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // При обновлении базы данных
-        clearAllTables();
-        onCreate(db);
+        //clearAllTables();
+        //onCreate(db);
     }
 
     public User getUserByUsername(String username) {
