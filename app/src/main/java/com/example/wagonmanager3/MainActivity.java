@@ -2,6 +2,7 @@ package com.example.wagonmanager3;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -13,10 +14,17 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.wagonmanager3.adapters.InventoryAdapter;
+import com.example.wagonmanager3.adapters.InventoryTableAdapter;
 import com.example.wagonmanager3.adapters.ScanHistoryAdapter;
 import com.example.wagonmanager3.database.DatabaseHelper;
 import com.example.wagonmanager3.database.DatabaseInitializer;
+import com.example.wagonmanager3.models.InventoryGroup;
+import com.example.wagonmanager3.models.InventoryItem;
+import com.example.wagonmanager3.models.InventoryTableRow;
 import com.example.wagonmanager3.models.ScanHistory;
+import com.example.wagonmanager3.models.Wagon;
+
 import androidx.appcompat.widget.Toolbar;
 
 
@@ -92,20 +100,53 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
     }
 
     private void showEditDialog(ScanHistory scanHistory) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Редактирование записи");
+        List<InventoryGroup> allInventoryGroup = dbHelper.getAllInventoryGroups();
+        List<InventoryItem> allInventoryItems = dbHelper.getAllInventoryItems();
+        List<ScanHistory> allScanned = dbHelper.getAllScanHistory();
+        List<Wagon> allWagons = dbHelper.getAllWagons();
 
-        View view = getLayoutInflater().inflate(R.layout.dialog_edit_scan, null);
-        EditText etNotes = view.findViewById(R.id.et_notes);
+        List<InventoryGroup> inventoryGroup = dbHelper.getInventoryGroupByWagonUuid(scanHistory.getWagonUuid());
+        List<InventoryItem> inventoryItems = dbHelper.getInventoryItemsByWagonUuid(scanHistory.getWagonUuid());
 
-        builder.setView(view);
-        builder.setPositiveButton("Сохранить", (dialog, which) -> {
-            // Здесь можно добавить логику сохранения изменений
-            Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_SHORT).show();
-        });
-        builder.setNegativeButton("Отмена", null);
+        List<InventoryTableRow> tableRows = new ArrayList<>();
+        for (InventoryGroup group : inventoryGroup) {
+            for (InventoryItem item : inventoryItems) {
+                if (item.getGroupId().equals(group.getUuid())) {
+                    tableRows.add(new InventoryTableRow(
+                            group.getName(),
+                            item.getName(),
+                            item.getQuantity()));
+                }
+            }
+        }
 
-        builder.show();
+        System.out.println(">>> showEditDialog: " + tableRows.size() + " rows found for wagon " + scanHistory.getWagonUuid());
+        // Создаём диалог с кастомным layout
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_wagon, null);
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerViewInventory);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new InventoryTableAdapter(tableRows));
+
+        new AlertDialog.Builder(this)
+        .setView(dialogView)
+        .setCancelable(true)
+        .show();
+
+
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Редактирование записи");
+//
+//        View view = getLayoutInflater().inflate(R.layout.dialog_edit_scan, null);
+//        EditText etNotes = view.findViewById(R.id.et_notes);
+//
+//        builder.setView(view);
+//        builder.setPositiveButton("Сохранить", (dialog, which) -> {
+//            // Здесь можно добавить логику сохранения изменений
+//            Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_SHORT).show();
+//        });
+//        builder.setNegativeButton("Отмена", null);
+//
+//        builder.show();
     }
 
     private void showDeleteDialog(ScanHistory scanHistory) {

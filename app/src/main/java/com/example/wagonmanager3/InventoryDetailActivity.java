@@ -64,7 +64,7 @@ public class InventoryDetailActivity extends AppCompatActivity {
         InventoryItem item = dbHelper.getInventoryItemById(itemId);
         if (item != null) {
             itemName.setText(item.getName());
-            itemGroup.setText((int) item.getGroupId());
+            itemGroup.setText(item.getGroupId());
             itemQuantity.setText(String.format("Количество: %d", item.getQuantity()));
             itemDescription.setText(item.getDescription());
             getSupportActionBar().setTitle(item.getName());

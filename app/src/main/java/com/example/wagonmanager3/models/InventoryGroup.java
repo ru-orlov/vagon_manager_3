@@ -21,8 +21,9 @@ public class InventoryGroup {
         this.syncStatus = "synced";
     }
 
-    public InventoryGroup(String name, String vagonUuid, String description) {
+    public InventoryGroup(String uuid, String name, String vagonUuid, String description) {
         this();
+        this.uuid = uuid;
         this.name = name;
         this.vagonUuid = vagonUuid;
         this.description = description;

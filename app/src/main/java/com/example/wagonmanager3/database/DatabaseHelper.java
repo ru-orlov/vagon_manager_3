@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.example.wagonmanager3.models.InventoryGroup;
 import com.example.wagonmanager3.models.InventoryItem;
@@ -116,30 +117,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
-    public long addWagon(Wagon wagon) {
+    public long addWagon(Wagon wagon) { //create
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = wagon.toContentValues();
-
-        long id = db.insert(DbContract.Wagons.TABLE_NAME, null, values);
-
-        // Логируем создание вагона
-        if (id != -1) {
-            addChangeLog(
-                    DbContract.Wagons.TABLE_NAME,
-                    id,
-                    "create",
-                    null,
-                    values.toString()
-            );
-        }
-
-        return id;
+        values.put(DbContract.Wagons.COLUMN_UUID, wagon.getUuid());
+        values.put(DbContract.Wagons.COLUMN_NUMBER, wagon.getNumber());
+        values.put(DbContract.Wagons.COLUMN_VAGON_UUID, wagon.getVagonUuid());
+        values.put(DbContract.Wagons.COLUMN_TYPE, wagon.getType());
+        values.put(DbContract.Wagons.COLUMN_CREATED_AT, System.currentTimeMillis());
+        values.put(DbContract.Wagons.COLUMN_UPDATED_AT, System.currentTimeMillis());
+        values.put(DbContract.Wagons.COLUMN_SYNC_STATUS, "new"); // При создании статус "new"
+        return db.insert(DbContract.Wagons.TABLE_NAME, null, values);
     }
 
-    public void addInventoryGroup(InventoryGroup group) {
+    public long addInventoryGroup(InventoryGroup group) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = group.toContentValues();
-
+        ContentValues values = new ContentValues();
         values.put(DbContract.InventoryGroups.COLUMN_UUID, group.getUuid());
         values.put(DbContract.InventoryGroups.COLUMN_NAME, group.getName());
         values.put(DbContract.InventoryGroups.COLUMN_VAGON_UUID, group.getVagonUuid());
@@ -147,9 +140,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(DbContract.InventoryGroups.COLUMN_CREATED_AT, System.currentTimeMillis());
         values.put(DbContract.InventoryGroups.COLUMN_UPDATED_AT, System.currentTimeMillis());
         values.put(DbContract.InventoryGroups.COLUMN_SYNC_STATUS, "new"); // При создании статус "new"
-
-        db.insert(DbContract.InventoryGroups.TABLE_NAME, null, values);
+        return db.insert(DbContract.InventoryGroups.TABLE_NAME, null, values);
     }
+
+
 
     public List<InventoryGroup> getAllInventoryGroups() {
         List<InventoryGroup> groups = new ArrayList<>();
@@ -199,7 +193,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         InventoryItem item = new InventoryItem(
                             cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)),
                             cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UUID)),
-                            cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)),
                             cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_VAGON_UUID)),
                             cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)),
                             cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)),
@@ -243,7 +237,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(DbContract.ScanHistory.COLUMN_WAGON_NUMBER, historyItem.getWagonNumber());
         values.put(DbContract.ScanHistory.COLUMN_USER_UUID, historyItem.getUserUuid());
         values.put(DbContract.ScanHistory.COLUMN_SCAN_TIME, historyItem.getScanTime().getTime());
-
         db.insert(DbContract.ScanHistory.TABLE_NAME, null, values);
     }
 
@@ -281,6 +274,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(DbContract.InventoryItems.COLUMN_UUID, item.getUuid());
         values.put(DbContract.InventoryItems.COLUMN_GROUP_ID, item.getGroupId());
+        values.put(DbContract.InventoryItems.COLUMN_VAGON_UUID, item.getVagonUuid());
         values.put(DbContract.InventoryItems.COLUMN_NAME, item.getName());
         values.put(DbContract.InventoryItems.COLUMN_DESCRIPTION, item.getDescription());
         values.put(DbContract.InventoryItems.COLUMN_QUANTITY, item.getQuantity());
@@ -304,7 +298,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             items.add(new InventoryItem(
                     cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)),
                     cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UUID)),
-                    cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)),
                     cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_VAGON_UUID)),
                     cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)),
                     cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)),

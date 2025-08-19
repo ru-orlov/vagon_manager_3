@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public class Wagon {
     private long id;
+    private String uuid;
     private String vagonUuid;
     private String number;
     private String type;
@@ -15,6 +16,14 @@ public class Wagon {
     private Date createdAt;
     private Date updatedAt;
     private String syncStatus;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     // Конструкторы
     public Wagon() {

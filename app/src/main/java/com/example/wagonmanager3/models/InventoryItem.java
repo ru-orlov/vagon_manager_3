@@ -3,12 +3,11 @@ package com.example.wagonmanager3.models;
 import com.example.wagonmanager3.database.DbContract;
 
 import java.util.Date;
-import java.util.UUID;
 
 public class InventoryItem {
     private long id;
     private String uuid;
-    private long groupId;
+    private String groupId;
     private String vagonUuid;
     private String name;
     private String description;
@@ -35,7 +34,7 @@ public class InventoryItem {
         this.vagonUuid = vagonUuid;
     }
 
-    public InventoryItem(long id, String uuid, long groupId, String vagonUuid, String name, String description,
+    public InventoryItem(long id, String uuid, String groupId, String vagonUuid, String name, String description,
                          int quantity, Date createdAt, Date updatedAt, String syncStatus) {
         this.id = id;
         this.uuid = uuid;
@@ -49,8 +48,9 @@ public class InventoryItem {
         this.syncStatus = syncStatus;
     }
 
-    public InventoryItem(String uuid, long groupId, String name, String description, int quantity, String syncStatus) {
+    public InventoryItem(String uuid, String vagonUuid, String groupId, String name, String description, int quantity, String syncStatus) {
         this.uuid = uuid;
+        this.vagonUuid = vagonUuid;
         this.groupId = groupId;
         this.name = name;
         this.description = description;
@@ -67,7 +67,7 @@ public class InventoryItem {
         return uuid;
     }
 
-    public long getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
@@ -104,7 +104,7 @@ public class InventoryItem {
         this.uuid = uuid;
     }
 
-    public void setGroupId(long groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
         this.updatedAt = new Date();
     }
@@ -163,7 +163,7 @@ public class InventoryItem {
         InventoryItem item = new InventoryItem(); // This line should now be valid
         item.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)));
         item.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UUID)));
-        item.setGroupId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)));
+        item.setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)));
         item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
         item.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)));
         item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)));

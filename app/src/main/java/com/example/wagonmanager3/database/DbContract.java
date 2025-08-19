@@ -19,8 +19,8 @@ public class DbContract {
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_UUID + " TEXT UNIQUE NOT NULL,"
-                + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL,"
+                + COLUMN_UUID + " TEXT NOT NULL,"
+                + COLUMN_USERNAME + " TEXT NOT NULL,"
                 + COLUMN_PASSWORD_HASH + " TEXT NOT NULL,"
                 + COLUMN_FULL_NAME + " TEXT NOT NULL,"
                 + COLUMN_ROLE + " TEXT NOT NULL CHECK(" + COLUMN_ROLE + " IN ('conductor', 'employee', 'responsible')),"
@@ -47,8 +47,8 @@ public class DbContract {
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_UUID + " TEXT UNIQUE NOT NULL,"
-                + COLUMN_NUMBER + " TEXT UNIQUE NOT NULL,"
+                + COLUMN_UUID + " TEXT NOT NULL,"
+                + COLUMN_NUMBER + " TEXT NOT NULL,"
                 + COLUMN_VAGON_UUID + " TEXT,"
                 + COLUMN_TYPE + " TEXT NOT NULL,"
                 + COLUMN_VU_9_NUMBER + " TEXT,"
@@ -100,18 +100,16 @@ public class DbContract {
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_UUID + " TEXT UNIQUE NOT NULL,"
-                + COLUMN_GROUP_ID + " INTEGER NOT NULL,"
-                + COLUMN_VAGON_UUID + " INTEGER NOT NULL,"
-                + COLUMN_NAME + " TEXT NOT NULL,"
+                + COLUMN_UUID + " TEXT,"
+                + COLUMN_GROUP_ID + " INTEGER,"
+                + COLUMN_VAGON_UUID + " INTEGER,"
+                + COLUMN_NAME + " TEXT,"
                 + COLUMN_DESCRIPTION + " TEXT,"
-                + COLUMN_QUANTITY + " INTEGER DEFAULT 1,"
+                + COLUMN_QUANTITY + " INTEGER,"
                 + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_UPDATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' "
-                + "CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted')),"
-                + "FOREIGN KEY (" + COLUMN_GROUP_ID + ") REFERENCES "
-                + InventoryGroups.TABLE_NAME + "(" + InventoryGroups.COLUMN_ID + "))";
+                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted'))"
+                + ")";
 
         // Индексы для ускорения запросов
         public static final String INDEX_GROUP_ID = "CREATE INDEX idx_inventory_items_group_id "
@@ -137,7 +135,7 @@ public class DbContract {
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_UUID + " TEXT UNIQUE NOT NULL,"
+                + COLUMN_UUID + " TEXT NOT NULL,"
                 + COLUMN_WAGON_ID + " INTEGER NOT NULL,"
                 + COLUMN_ITEM_ID + " INTEGER NOT NULL,"
                 + COLUMN_QUANTITY + " INTEGER NOT NULL DEFAULT 1,"
@@ -145,9 +143,8 @@ public class DbContract {
                 + COLUMN_NOTES + " TEXT,"
                 + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_UPDATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted')),"
-                + "FOREIGN KEY (" + COLUMN_WAGON_ID + ") REFERENCES " + Wagons.TABLE_NAME + "(" + COLUMN_ID + "),"
-                + "FOREIGN KEY (" + COLUMN_ITEM_ID + ") REFERENCES " + InventoryItems.TABLE_NAME + "(" + COLUMN_ID + "))";
+                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted'))"
+                + ")";
     }
 
     // Таблица истории сканирований
@@ -163,14 +160,13 @@ public class DbContract {
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_UUID + " TEXT UNIQUE NOT NULL,"
+                + COLUMN_UUID + " TEXT NOT NULL,"
                 + COLUMN_WAGON_UUID + " TEXT NOT NULL,"
                 + COLUMN_WAGON_NUMBER + " TEXT NOT NULL,"
                 + COLUMN_SCAN_TIME + " TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_USER_UUID + " TEXT NOT NULL,"
-                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted')),"
-                + "FOREIGN KEY (" + COLUMN_WAGON_UUID + ") REFERENCES " + Wagons.TABLE_NAME + "(" + COLUMN_UUID + "),"
-                + "FOREIGN KEY (" + COLUMN_USER_UUID + ") REFERENCES " + Users.TABLE_NAME + "(" + COLUMN_UUID + "))";
+                + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted'))"
+                + ")";
     }
 
     // Таблица логов изменений
@@ -193,7 +189,6 @@ public class DbContract {
                 + COLUMN_ACTION + " TEXT NOT NULL CHECK(" + COLUMN_ACTION + " IN ('create', 'update', 'delete')),"
                 + COLUMN_OLD_VALUES + " TEXT,"
                 + COLUMN_NEW_VALUES + " TEXT,"
-                + COLUMN_CHANGED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                + "FOREIGN KEY (" + COLUMN_USER_ID + ") REFERENCES " + Users.TABLE_NAME + "(" + COLUMN_ID + "))";
+                + COLUMN_CHANGED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
     }
 }
