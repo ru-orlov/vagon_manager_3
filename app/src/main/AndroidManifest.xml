@@ -26,8 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".HistoryActivity" />
-        <activity android:name=".InventoryActivity" />
         <activity android:name=".InventoryDetailActivity" />
+        <activity android:name=".WagonInventoryActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

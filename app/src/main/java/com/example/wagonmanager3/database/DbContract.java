@@ -37,7 +37,6 @@ public class DbContract {
         public static final String COLUMN_ID = "id";
         public static final String COLUMN_UUID = "uuid";
         public static final String COLUMN_NUMBER = "number";
-        public static final String COLUMN_VAGON_UUID = "vagonUuid";
         public static final String COLUMN_TYPE = "type";
         public static final String COLUMN_VU_9_NUMBER = "vu_9_number";
         public static final String COLUMN_VU_9_DATE = "vu_9_date";
@@ -49,7 +48,6 @@ public class DbContract {
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_UUID + " TEXT NOT NULL,"
                 + COLUMN_NUMBER + " TEXT NOT NULL,"
-                + COLUMN_VAGON_UUID + " TEXT,"
                 + COLUMN_TYPE + " TEXT NOT NULL,"
                 + COLUMN_VU_9_NUMBER + " TEXT,"
                 + COLUMN_VU_9_DATE + " DATE,"

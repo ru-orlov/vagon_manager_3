@@ -2,9 +2,6 @@ package com.example.wagonmanager3;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -14,18 +11,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.wagonmanager3.adapters.InventoryAdapter;
-import com.example.wagonmanager3.adapters.InventoryTableAdapter;
 import com.example.wagonmanager3.adapters.ScanHistoryAdapter;
 import com.example.wagonmanager3.database.DatabaseHelper;
 import com.example.wagonmanager3.database.DatabaseInitializer;
-import com.example.wagonmanager3.models.InventoryGroup;
-import com.example.wagonmanager3.models.InventoryItem;
-import com.example.wagonmanager3.models.InventoryTableRow;
 import com.example.wagonmanager3.models.ScanHistory;
-import com.example.wagonmanager3.models.Wagon;
-
-import androidx.appcompat.widget.Toolbar;
 
 
 import java.util.ArrayList;

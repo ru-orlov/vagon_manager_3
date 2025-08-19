@@ -78,17 +78,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long id = db.insert(DbContract.Users.TABLE_NAME, null, values);
 
-        // Логируем создание пользователя
-        if (id != -1) {
-            addChangeLog(
-                    DbContract.Users.TABLE_NAME,
-                    id,
-                    "create",
-                    null,
-                    values.toString()
-            );
-        }
-
         return id;
     }
 
@@ -101,13 +90,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
 
         // Логируем удаление
-        addChangeLog(
-                DbContract.ScanHistory.TABLE_NAME,
-                -1, // ID неизвестен
-                "delete",
-                scanHistory.toString(),
-                null
-        );
+//        addChangeLog(
+//                DbContract.ScanHistory.TABLE_NAME,
+//                -1, // ID неизвестен
+//                "delete",
+//                scanHistory.toString(),
+//                null
+//        );
     }
 
     public long addWagon(Wagon wagon) { //create
@@ -115,7 +104,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = wagon.toContentValues();
         values.put(DbContract.Wagons.COLUMN_UUID, wagon.getUuid());
         values.put(DbContract.Wagons.COLUMN_NUMBER, wagon.getNumber());
-        values.put(DbContract.Wagons.COLUMN_VAGON_UUID, wagon.getVagonUuid());
         values.put(DbContract.Wagons.COLUMN_TYPE, wagon.getType());
         values.put(DbContract.Wagons.COLUMN_CREATED_AT, System.currentTimeMillis());
         values.put(DbContract.Wagons.COLUMN_UPDATED_AT, System.currentTimeMillis());
@@ -296,22 +284,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
         return items;
-    }
-
-    public List<Wagon> getAllWagons() {
-        List<Wagon> wagons = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-
-        try (Cursor cursor = db.query(DbContract.Wagons.TABLE_NAME, null, null, null, null, null, null)) {
-            while (cursor.moveToNext()) {
-                Wagon wagon = new Wagon();
-                wagon.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_ID)));
-                //wagon.setVagonUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_VAGON_UUID)));
-                wagon.setNumber(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_NUMBER)));
-                wagons.add(wagon);
-            }
-        }
-        return wagons;
     }
 
     public InventoryItem getInventoryItemById(long itemId) {

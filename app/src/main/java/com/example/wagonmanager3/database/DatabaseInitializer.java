@@ -47,7 +47,7 @@ public class DatabaseInitializer {
     private void createSingleScanHistory(Wagon wagon, User user) {
         ScanHistory history = new ScanHistory(
                 UUID.randomUUID().toString(),
-                wagon.getVagonUuid(),
+                wagon.getUuid(),
                 wagon.getNumber(),
                 user.getUuid(),
                 new Date() // Текущая дата
