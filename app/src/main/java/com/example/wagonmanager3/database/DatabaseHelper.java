@@ -385,4 +385,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return groups;
     }
+
+    public User getRandomUser() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        User user = null;
+
+        Cursor cursor = db.query(
+                DbContract.Users.TABLE_NAME,
+                null,
+                null, null, null, null,
+                "RANDOM()",
+                "1" // Ограничение на 1 запись
+        );
+
+        if (cursor.moveToFirst()) {
+            user = new User(
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_UUID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_USERNAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_PASSWORD_HASH)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_FULL_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_ROLE)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_IS_ACTIVE)) == 1
+            );
+        }
+        cursor.close();
+        return user;
+    }
 }

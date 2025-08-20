@@ -18,12 +18,16 @@ import com.example.wagonmanager3.adapters.ScanHistoryAdapter;
 import com.example.wagonmanager3.database.DatabaseHelper;
 import com.example.wagonmanager3.database.DatabaseInitializer;
 import com.example.wagonmanager3.models.ScanHistory;
+import com.example.wagonmanager3.models.User;
+import com.example.wagonmanager3.models.Wagon;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements ScanHistoryAdapter.OnItemClickListener {
     private RecyclerView rvScanHistory;
@@ -37,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
                     String vagonUuid = result.getContents();
                     Intent intent = new Intent(this, WagonInventoryActivity.class);
                     intent.putExtra("WagonUuid", vagonUuid);
+                    logScanHistrory(intent);
                     startActivity(intent);
                 }
             });
@@ -64,6 +69,22 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
             options.setBarcodeImageEnabled(true);
             barcodeLauncher.launch(options);
         });
+    }
+
+    private void logScanHistrory(Intent intent) {
+        String wagonUuid = intent.getStringExtra("WagonUuid");
+        Wagon wagon = dbHelper.getWagonByUuid(wagonUuid);
+        User user = dbHelper.getRandomUser();
+        if (wagon != null && user != null) {
+            ScanHistory scan = new ScanHistory(
+                    UUID.randomUUID().toString(),
+                    wagon.getUuid(),
+                    wagon.getNumber(),
+                    user.getUuid(),
+                    new Date()
+            );
+            dbHelper.addScanHistory(scan);
+        }
     }
     private void initializeTestDataOnce() {
         boolean isInitialized = getDatabasePath(dbHelper.getDatabaseName()).exists();
