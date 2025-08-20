@@ -14,12 +14,10 @@ import com.example.wagonmanager3.models.InventoryItem;
 import com.example.wagonmanager3.models.ScanHistory;
 import com.example.wagonmanager3.models.User;
 import com.example.wagonmanager3.models.Wagon;
-import com.example.wagonmanager3.models.WagonInventory;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "vu9journal.db";
@@ -44,7 +42,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // При обновлении базы данных
         clearAllTables();
-        //onCreate(db);
     }
 
     public User getUserByUsername(String username) {

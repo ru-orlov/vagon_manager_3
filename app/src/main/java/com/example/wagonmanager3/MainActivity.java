@@ -1,6 +1,8 @@
 package com.example.wagonmanager3;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -14,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wagonmanager3.adapters.ScanHistoryAdapter;
 import com.example.wagonmanager3.database.DatabaseHelper;
-//import com.example.wagonmanager3.database.DatabaseInitializer;
+import com.example.wagonmanager3.database.DatabaseInitializer;
 import com.example.wagonmanager3.models.ScanHistory;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
     private RecyclerView rvScanHistory;
     private ScanHistoryAdapter adapter;
     private DatabaseHelper dbHelper;
+    private static final String PREFS_NAME = "vagon_manager_prefs";
+    private static final String KEY_TEST_DATA_INITIALIZED = "test_data_initialized";
 
     private final ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(
             new ScanContract(),
@@ -47,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
         dbHelper = new DatabaseHelper(this);
 
         // Инициализация тестовых данных
-        //new DatabaseInitializer(this).initializeTestData();
+        initializeTestDataOnce();
 
         setupToolbar();
         setupRecyclerView();
@@ -62,6 +66,15 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
             options.setBarcodeImageEnabled(true);
             barcodeLauncher.launch(options);
         });
+    }
+    private void initializeTestDataOnce() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        boolean isInitialized = prefs.getBoolean(KEY_TEST_DATA_INITIALIZED, false);
+        if (!isInitialized) {
+            DatabaseInitializer dbInit = new DatabaseInitializer(this);
+            dbInit.initializeTestData();
+            prefs.edit().putBoolean(KEY_TEST_DATA_INITIALIZED, true).apply();
+        }
     }
 
     private void setupToolbar() {
