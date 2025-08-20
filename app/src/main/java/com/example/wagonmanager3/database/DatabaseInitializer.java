@@ -15,12 +15,6 @@ public class DatabaseInitializer {
 
     public void initializeTestData() {
         // Очищаем базу перед добавлением тестовых данных
-        dbHelper.clearAllTables();
-
-        // Добавляем тестовых пользователей
-        User responsibleUser = createUser("responsible", "Ответственный", "responsible");
-        User conductorUser = createUser("conductor", "Проводник Иванов", "conductor");
-
         String wagon1Uuid = UUID.randomUUID().toString();
         String wagon2Uuid = UUID.randomUUID().toString();
         String wagon3Uuid = UUID.randomUUID().toString();
@@ -50,15 +44,17 @@ public class DatabaseInitializer {
         createPlumbingEquipmentItems(group32.getUuid(), wagon3Uuid);
 
 
+        User responsibleUser = createUser("responsible", "Ответственный", "responsible");
+        User conductorUser = createUser("conductor", "Проводник Иванов", "conductor");
 
         Wagon wagon1 = createWagon("Вагон 1321", wagon1Uuid, "Пассажирский");
         Wagon wagon2 = createWagon("Вагон 2495", wagon2Uuid, "Пассажирский");
         Wagon wagon3 = createWagon("Вагон 3753", wagon3Uuid, "Грузовой");
 
 //        // Добавляем по одному сканированию для каждого вагона
-        createSingleScanHistory(wagon1, conductorUser);
-        createSingleScanHistory(wagon2, conductorUser);
-        createSingleScanHistory(wagon3, responsibleUser);
+//        createSingleScanHistory(wagon1, conductorUser);
+//        createSingleScanHistory(wagon2, conductorUser);
+//        createSingleScanHistory(wagon3, responsibleUser);
     }
 
     private void createSingleScanHistory(Wagon wagon, User user) {

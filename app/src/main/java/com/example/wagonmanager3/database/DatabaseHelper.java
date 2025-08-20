@@ -14,12 +14,10 @@ import com.example.wagonmanager3.models.InventoryItem;
 import com.example.wagonmanager3.models.ScanHistory;
 import com.example.wagonmanager3.models.User;
 import com.example.wagonmanager3.models.Wagon;
-import com.example.wagonmanager3.models.WagonInventory;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "vu9journal.db";
@@ -44,7 +42,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // При обновлении базы данных
         clearAllTables();
-        onCreate(db);
     }
 
     public User getUserByUsername(String username) {
@@ -156,8 +153,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             number = cursor.getString(0);
         }
         cursor.close();
-
         return number;
+    }
+
+    public Wagon getWagonByUuid(String wagonUuid) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Wagon wagon = null;
+
+        Cursor cursor = db.query(
+                DbContract.Wagons.TABLE_NAME,
+                null,
+                DbContract.Wagons.COLUMN_UUID + " = ?",
+                new String[]{wagonUuid},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            wagon = new Wagon(
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_NUMBER)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_UUID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_TYPE))
+            );
+        }
+        cursor.close();
+        return wagon;
     }
 
 
@@ -366,5 +384,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return groups;
+    }
+
+    public User getRandomUser() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        User user = null;
+
+        Cursor cursor = db.query(
+                DbContract.Users.TABLE_NAME,
+                null,
+                null, null, null, null,
+                "RANDOM()",
+                "1" // Ограничение на 1 запись
+        );
+
+        if (cursor.moveToFirst()) {
+            user = new User(
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_UUID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_USERNAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_PASSWORD_HASH)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_FULL_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_ROLE)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.Users.COLUMN_IS_ACTIVE)) == 1
+            );
+        }
+        cursor.close();
+        return user;
     }
 }

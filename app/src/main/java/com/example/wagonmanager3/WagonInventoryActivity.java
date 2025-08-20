@@ -1,6 +1,5 @@
 package com.example.wagonmanager3;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,14 +13,13 @@ import com.example.wagonmanager3.adapters.InventorySectionAdapter;
 import com.example.wagonmanager3.database.DatabaseHelper;
 import com.example.wagonmanager3.models.InventoryGroup;
 import com.example.wagonmanager3.models.InventoryItem;
-import com.example.wagonmanager3.utils.QRCodeUtils;
+import com.example.wagonmanager3.models.Wagon;
 
 import java.util.List;
 
 
 public class WagonInventoryActivity extends AppCompatActivity {
     private RecyclerView inventoryRecyclerView;
-    private String wagonUuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +31,17 @@ public class WagonInventoryActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         inventoryRecyclerView = findViewById(R.id.inventoryRecyclerView);
-        wagonUuid = getIntent().getStringExtra("WagonUuid");
+        String wagonUuid = getIntent().getStringExtra("WagonUuid");
 
         // Теперь вызов getSupportActionBar() безопасен:
-        getSupportActionBar().setTitle("Инвентарь вагона " + wagonUuid);
+        getSupportActionBar().setTitle("Инвентарь вагона " + getWagonNumber(wagonUuid));
 
-        List<InventoryItem> inventoryItems = loadInventoryList();
-        List<InventoryGroup> inventoryGroups = loadInventoryGroupList();
+        List<InventoryItem> inventoryItems = loadInventoryList(wagonUuid);
+        List<InventoryGroup> inventoryGroups = loadInventoryGroupList(wagonUuid);
+        System.out.println(">>> Wagon UUID: " + wagonUuid);
+        System.out.println(">>> Inventory Items: " + inventoryItems.size());
+        System.out.println(">>> Inventory Groups: " + inventoryGroups.size());
+
         InventorySectionAdapter adapter = new InventorySectionAdapter(inventoryGroups, inventoryItems);
         inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         inventoryRecyclerView.setAdapter(adapter);
@@ -48,18 +50,20 @@ public class WagonInventoryActivity extends AppCompatActivity {
 
     private String getWagonNumber(String wagonUuid) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        return dbHelper.getWagonNumberByUuid(wagonUuid);
+        Wagon wagon = dbHelper.getWagonByUuid(wagonUuid);
+        return wagon.getNumber();
     }
     private void setupRecyclerView() {
         inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         inventoryRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
-    private List<InventoryItem> loadInventoryList() {
+
+    private List<InventoryItem> loadInventoryList(String wagonUuid) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         return dbHelper.getInventoryItemsByWagonUuid(wagonUuid);
     }
 
-    private List<InventoryGroup> loadInventoryGroupList() {
+    private List<InventoryGroup> loadInventoryGroupList(String wagonUuid) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         return dbHelper.getInventoryGroupByWagonUuid(wagonUuid);
     }
@@ -89,15 +93,5 @@ public class WagonInventoryActivity extends AppCompatActivity {
 //        }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void openAddInventoryItem() {
-        Intent intent = new Intent(this, InventoryEditActivity.class);
-        intent.putExtra("wagon_uuid", wagonUuid);
-        startActivity(intent);
-    }
-
-    private void shareWagonQr() {
-        QRCodeUtils.shareWagonQR(this, wagonUuid);
     }
 }

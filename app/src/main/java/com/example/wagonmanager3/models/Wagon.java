@@ -110,22 +110,4 @@ public class Wagon {
         values.put(DbContract.Wagons.COLUMN_SYNC_STATUS, syncStatus);
         return values;
     }
-
-    public static Wagon fromCursor(android.database.Cursor cursor) {
-        Wagon wagon = new Wagon();
-        wagon.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_ID)));
-        wagon.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_UUID)));
-        wagon.setNumber(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_NUMBER)));
-        wagon.setType(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_TYPE)));
-
-        long createdAtMillis = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_CREATED_AT));
-        wagon.setCreatedAt(new Date(createdAtMillis));
-
-        long updatedAtMillis = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_UPDATED_AT));
-        wagon.setUpdatedAt(new Date(updatedAtMillis));
-
-        wagon.setSyncStatus(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.Wagons.COLUMN_SYNC_STATUS)));
-
-        return wagon;
-    }
 }
