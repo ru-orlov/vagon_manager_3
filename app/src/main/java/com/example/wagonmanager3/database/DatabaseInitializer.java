@@ -15,8 +15,6 @@ public class DatabaseInitializer {
 
     public void initializeTestData() {
         // Очищаем базу перед добавлением тестовых данных
-        dbHelper.clearAllTables();
-
         String wagon1Uuid = UUID.randomUUID().toString();
         String wagon2Uuid = UUID.randomUUID().toString();
         String wagon3Uuid = UUID.randomUUID().toString();

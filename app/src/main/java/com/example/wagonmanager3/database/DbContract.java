@@ -38,8 +38,6 @@ public class DbContract {
         public static final String COLUMN_UUID = "uuid";
         public static final String COLUMN_NUMBER = "number";
         public static final String COLUMN_TYPE = "type";
-        public static final String COLUMN_VU_9_NUMBER = "vu_9_number";
-        public static final String COLUMN_VU_9_DATE = "vu_9_date";
         public static final String COLUMN_CREATED_AT = "created_at";
         public static final String COLUMN_UPDATED_AT = "updated_at";
         public static final String COLUMN_SYNC_STATUS = "sync_status";
@@ -49,8 +47,6 @@ public class DbContract {
                 + COLUMN_UUID + " TEXT NOT NULL,"
                 + COLUMN_NUMBER + " TEXT NOT NULL,"
                 + COLUMN_TYPE + " TEXT NOT NULL,"
-                + COLUMN_VU_9_NUMBER + " TEXT,"
-                + COLUMN_VU_9_DATE + " DATE,"
                 + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_UPDATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted'))"

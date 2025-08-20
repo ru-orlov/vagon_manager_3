@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
     private RecyclerView rvScanHistory;
     private ScanHistoryAdapter adapter;
     private DatabaseHelper dbHelper;
-    private static final String PREFS_NAME = "vagon_manager_prefs";
-    private static final String KEY_TEST_DATA_INITIALIZED = "test_data_initialized";
 
     private final ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(
             new ScanContract(),
@@ -68,12 +66,10 @@ public class MainActivity extends AppCompatActivity implements ScanHistoryAdapte
         });
     }
     private void initializeTestDataOnce() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        boolean isInitialized = prefs.getBoolean(KEY_TEST_DATA_INITIALIZED, false);
+        boolean isInitialized = getDatabasePath(dbHelper.getDatabaseName()).exists();
         if (!isInitialized) {
             DatabaseInitializer dbInit = new DatabaseInitializer(this);
             dbInit.initializeTestData();
-            prefs.edit().putBoolean(KEY_TEST_DATA_INITIALIZED, true).apply();
         }
     }
 
