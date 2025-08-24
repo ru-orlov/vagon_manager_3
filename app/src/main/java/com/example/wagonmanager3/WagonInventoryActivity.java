@@ -1,5 +1,6 @@
 package com.example.wagonmanager3;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,7 +77,7 @@ public class WagonInventoryActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.menu_wagon_inventory, menu);
+        getMenuInflater().inflate(R.menu.menu_wagon_inventory, menu);
         return true;
     }
 
@@ -84,14 +85,35 @@ public class WagonInventoryActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-//        if (id == R.id.action_add_item) {
-//            openAddInventoryItem();
-//            return true;
-//        } else if (id == R.id.action_share_qr) {
-//            shareWagonQr();
-//            return true;
-//        }
+        if (id == R.id.action_add_item) {
+            openAddInventoryItem();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+    
+    private void openAddInventoryItem() {
+        Intent intent = new Intent(this, InventoryEditActivity.class);
+        intent.putExtra("wagon_uuid", getIntent().getStringExtra("WagonUuid"));
+        startActivityForResult(intent, 1);
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Refresh the inventory list
+            refreshInventoryData();
+        }
+    }
+    
+    private void refreshInventoryData() {
+        String wagonUuid = getIntent().getStringExtra("WagonUuid");
+        List<InventoryItem> inventoryItems = loadInventoryList(wagonUuid);
+        List<InventoryGroup> inventoryGroups = loadInventoryGroupList(wagonUuid);
+        
+        InventorySectionAdapter adapter = new InventorySectionAdapter(inventoryGroups, inventoryItems);
+        inventoryRecyclerView.setAdapter(adapter);
     }
 }

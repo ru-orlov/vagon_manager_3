@@ -18,12 +18,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.example.wagonmanager3.database.DatabaseHelper;
+import com.example.wagonmanager3.models.InventoryGroup;
+import com.example.wagonmanager3.models.InventoryItem;
 import com.example.wagonmanager3.models.WagonInventory;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class InventoryEditActivity extends AppCompatActivity {
@@ -79,7 +82,26 @@ public class InventoryEditActivity extends AppCompatActivity {
         if (inventoryId != -1) {
             // Редактирование существующего элемента
             DatabaseHelper dbHelper = new DatabaseHelper(this);
-
+            InventoryItem item = dbHelper.getInventoryItemById(inventoryId);
+            
+            if (item != null) {
+                etItemName.setText(item.getName());
+                etDescription.setText(item.getDescription());
+                etQuantity.setText(String.valueOf(item.getQuantity()));
+                
+                // Set group dropdown value by finding the group name
+                String groupName = dbHelper.getInventoryGroupNameByUuid(item.getGroupId());
+                if (groupName != null) {
+                    actvGroup.setText(groupName, false);
+                }
+                
+                // If there's a condition field in the item model, set it here
+                // For now, we'll leave condition as default since it's not in the model
+                
+                setTitle("Редактировать элемент");
+            }
+        } else {
+            setTitle("Добавить элемент");
         }
     }
 
@@ -113,15 +135,92 @@ public class InventoryEditActivity extends AppCompatActivity {
         int quantity;
         try {
             quantity = Integer.parseInt(quantityStr);
+            if (quantity < 0) {
+                Toast.makeText(this, "Количество должно быть положительным числом", Toast.LENGTH_SHORT).show();
+                return;
+            }
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Некорректное количество", Toast.LENGTH_SHORT).show();
             return;
         }
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-
-
-        finish();
+        
+        try {
+            if (inventoryId == -1) {
+                // Создание нового элемента
+                String uuid = java.util.UUID.randomUUID().toString();
+                
+                // Find group UUID by name (we need to map the selected group name to UUID)
+                String groupUuid = findGroupUuidByName(group);
+                if (groupUuid == null) {
+                    Toast.makeText(this, "Группа не найдена", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                InventoryItem newItem = new InventoryItem();
+                newItem.setUuid(uuid);
+                newItem.setGroupId(groupUuid);
+                newItem.setVagonUuid(wagonUuid);
+                newItem.setName(name);
+                newItem.setDescription(description);
+                newItem.setQuantity(quantity);
+                newItem.setSyncStatus("new");
+                
+                long result = dbHelper.insertInventoryItem(newItem);
+                
+                if (result > 0) {
+                    Toast.makeText(this, "Элемент добавлен", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Ошибка при добавлении элемента", Toast.LENGTH_SHORT).show();
+                }
+                
+            } else {
+                // Обновление существующего элемента
+                InventoryItem existingItem = dbHelper.getInventoryItemById(inventoryId);
+                if (existingItem != null) {
+                    // Find group UUID by name
+                    String groupUuid = findGroupUuidByName(group);
+                    if (groupUuid == null) {
+                        Toast.makeText(this, "Группа не найдена", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    
+                    existingItem.setName(name);
+                    existingItem.setDescription(description);
+                    existingItem.setQuantity(quantity);
+                    existingItem.setGroupId(groupUuid);
+                    
+                    int result = dbHelper.updateInventoryItem(existingItem);
+                    
+                    if (result > 0) {
+                        Toast.makeText(this, "Элемент обновлен", Toast.LENGTH_SHORT).show();
+                        setResult(RESULT_OK);
+                        finish();
+                    } else {
+                        Toast.makeText(this, "Ошибка при обновлении элемента", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Элемент не найден", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    private String findGroupUuidByName(String groupName) {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        List<InventoryGroup> groups = dbHelper.getInventoryGroupByWagonUuid(wagonUuid);
+        
+        for (InventoryGroup group : groups) {
+            if (group.getName().equals(groupName)) {
+                return group.getUuid();
+            }
+        }
+        return null;
     }
 
     private void dispatchTakePictureIntent() {
