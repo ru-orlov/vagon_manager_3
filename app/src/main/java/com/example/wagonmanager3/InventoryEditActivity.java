@@ -63,6 +63,7 @@ public class InventoryEditActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_take_photo).setOnClickListener(v -> dispatchTakePictureIntent());
         findViewById(R.id.btn_remove_photo).setOnClickListener(v -> removePhoto());
+        findViewById(R.id.btn_cancel).setOnClickListener(v -> finish());
     }
 
     private void setupDropdowns() {
