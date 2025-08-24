@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -37,6 +38,7 @@ public class InventoryEditActivity extends AppCompatActivity {
     private EditText etItemName, etDescription, etQuantity;
     private AutoCompleteTextView actvGroup, actvCondition;
     private ImageView ivPhoto;
+    private ProgressBar progressBar;
     private String currentPhotoPath;
     private long inventoryId = -1;
     private String wagonUuid;
@@ -58,6 +60,7 @@ public class InventoryEditActivity extends AppCompatActivity {
         actvGroup = findViewById(R.id.actv_group);
         actvCondition = findViewById(R.id.actv_condition);
         ivPhoto = findViewById(R.id.iv_photo);
+        progressBar = findViewById(R.id.progress_bar);
 
         findViewById(R.id.btn_take_photo).setOnClickListener(v -> dispatchTakePictureIntent());
         findViewById(R.id.btn_remove_photo).setOnClickListener(v -> removePhoto());
@@ -125,9 +128,15 @@ public class InventoryEditActivity extends AppCompatActivity {
         wagonUuid = getIntent().getStringExtra("wagon_uuid");
 
         if (inventoryId != -1) {
+            // Show loading indicator
+            progressBar.setVisibility(View.VISIBLE);
+            
             // Редактирование существующего элемента
             DatabaseHelper dbHelper = new DatabaseHelper(this);
             InventoryItem item = dbHelper.getInventoryItemById(inventoryId);
+            
+            // Hide loading indicator
+            progressBar.setVisibility(View.GONE);
             
             if (item != null) {
                 // Загружаем данные элемента в поля формы
@@ -155,6 +164,7 @@ public class InventoryEditActivity extends AppCompatActivity {
                 }
                 
                 setTitle("Редактировать элемент");
+                Toast.makeText(this, "Данные элемента загружены", Toast.LENGTH_SHORT).show();
             } else {
                 // Элемент не найден в базе данных
                 Toast.makeText(this, "Элемент не найден в базе данных (ID: " + inventoryId + ")", Toast.LENGTH_LONG).show();
