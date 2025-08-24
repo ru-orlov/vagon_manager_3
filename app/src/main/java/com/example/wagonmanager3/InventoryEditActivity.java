@@ -9,12 +9,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
@@ -37,15 +39,29 @@ public class InventoryEditActivity extends AppCompatActivity {
     private AutoCompleteTextView actvGroup, actvCondition;
     private ImageView ivPhoto;
     private ProgressBar progressBar;
+    private Button btnSave, btnCancel;
     private String currentPhotoPath;
     private long inventoryId = -1;
     private String wagonUuid;
+    private String originalName = "";
+    private String originalDescription = "";
+    private String originalQuantity = "";
+    private String originalGroup = "";
+    private String originalCondition = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_edit);
         inventoryId = getIntent().getLongExtra("ITEM_ID", -1);
+        btnSave = findViewById(R.id.btn_save);
+        btnCancel = findViewById(R.id.btn_cancel);
+        btnSave.setOnClickListener(v -> saveInventory());
+
+        btnSave.setOnClickListener(v -> saveInventory());
+
+        // Set up cancel button click listener
+        btnCancel.setOnClickListener(v -> handleCancel());
 
         initViews();
         loadInventoryData(); // This will get wagonUuid from intent
@@ -210,6 +226,14 @@ public class InventoryEditActivity extends AppCompatActivity {
                     actvCondition.setText("Исправен", false); // Fallback default
                 }
 
+                // Store original values for change detection
+                originalName = etItemName.getText().toString();
+                originalDescription = etDescription.getText().toString();
+                originalQuantity = etQuantity.getText().toString();
+                originalGroup = actvGroup.getText().toString();
+                originalCondition = actvCondition.getText().toString();
+
+
                 setTitle("Редактировать элемент");
                 Toast.makeText(this, "Данные элемента загружены", Toast.LENGTH_SHORT).show();
             } else {
@@ -230,6 +254,68 @@ public class InventoryEditActivity extends AppCompatActivity {
                 actvCondition.setText("Исправен", false); // Fallback default
             }
         }
+        // Store original values for change detection (empty for new item)
+        originalName = "";
+        originalDescription = "";
+        originalQuantity = "";
+        originalGroup = "";
+        originalCondition = actvCondition.getText().toString();
+    }
+
+    private boolean hasUnsavedChanges() {
+        String currentName = etItemName.getText().toString();
+        String currentDescription = etDescription.getText().toString();
+        String currentQuantity = etQuantity.getText().toString();
+        String currentGroup = actvGroup.getText().toString();
+        String currentCondition = actvCondition.getText().toString();
+
+        return !originalName.equals(currentName) ||
+                !originalDescription.equals(currentDescription) ||
+                !originalQuantity.equals(currentQuantity) ||
+                !originalGroup.equals(currentGroup) ||
+                !originalCondition.equals(currentCondition);
+    }
+
+    /**
+     * Handle cancel button click
+     */
+    private void handleCancel() {
+        if (hasUnsavedChanges()) {
+            showCancelConfirmationDialog();
+        } else {
+            cancelAndFinish();
+        }
+    }
+
+    /**
+     * Show confirmation dialog when user has unsaved changes
+     */
+    private void showCancelConfirmationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Отменить изменения?")
+                .setMessage("У вас есть несохраненные изменения. Вы действительно хотите отменить редактирование?")
+                .setPositiveButton("Да, отменить", (dialog, which) -> {
+                    Toast.makeText(this, "Изменения не сохранены", Toast.LENGTH_SHORT).show();
+                    cancelAndFinish();
+                })
+                .setNegativeButton("Продолжить редактирование", null)
+                .show();
+    }
+
+    /**
+     * Cancel editing and finish activity
+     */
+    private void cancelAndFinish() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    /**
+     * Override back button to handle unsaved changes
+     */
+    @Override
+    public void onBackPressed() {
+        handleCancel();
     }
 
     @Override

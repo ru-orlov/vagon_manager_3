@@ -75,8 +75,17 @@ public class InventoryDetailActivity extends AppCompatActivity {
         editButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, InventoryEditActivity.class);
             intent.putExtra("item_id", itemId);
-            startActivity(intent);
+            startActivityForResult(intent, 1);
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Refresh the item data when coming back from successful edit
+            loadItemData();
+        }
     }
 
     @Override
