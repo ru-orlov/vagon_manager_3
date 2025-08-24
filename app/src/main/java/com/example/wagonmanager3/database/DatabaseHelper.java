@@ -340,6 +340,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         InventoryItem oldItem = getInventoryItemById(item.getId());
         
         ContentValues values = new ContentValues();
+        values.put(DbContract.InventoryItems.COLUMN_ID, item.getId());
         values.put(DbContract.InventoryItems.COLUMN_NAME, item.getName());
         values.put(DbContract.InventoryItems.COLUMN_DESCRIPTION, item.getDescription());
         values.put(DbContract.InventoryItems.COLUMN_QUANTITY, item.getQuantity());

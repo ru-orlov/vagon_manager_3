@@ -33,7 +33,6 @@ import java.util.Locale;
 
 public class InventoryEditActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
-
     private EditText etItemName, etDescription, etQuantity;
     private AutoCompleteTextView actvGroup, actvCondition;
     private ImageView ivPhoto;
@@ -46,6 +45,7 @@ public class InventoryEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_edit);
+        inventoryId = getIntent().getLongExtra("ITEM_ID", -1);
 
         initViews();
         loadInventoryData(); // This will get wagonUuid from intent
@@ -64,6 +64,56 @@ public class InventoryEditActivity extends AppCompatActivity {
         findViewById(R.id.btn_take_photo).setOnClickListener(v -> dispatchTakePictureIntent());
         findViewById(R.id.btn_remove_photo).setOnClickListener(v -> removePhoto());
         findViewById(R.id.btn_cancel).setOnClickListener(v -> finish());
+        findViewById(R.id.btn_save).setOnClickListener(v -> saveInventoryItem());
+    }
+
+    private void saveInventoryItem() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        // Валидация → Сохранение в БД → setResult(RESULT_OK) → finish()
+        String itemName = etItemName.getText().toString().trim();
+        String description = etDescription.getText().toString().trim();
+        String quantityStr = etQuantity.getText().toString().trim();
+        String group = actvGroup.getText().toString().trim();
+        String condition = actvCondition.getText().toString().trim();
+        inventoryId = getIntent().getLongExtra("inventory_id", -1);
+
+        // Проверка названия (обязательно)
+        if (itemName.isEmpty()) {
+            Toast.makeText(this, "Введите название предмета", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Проверка количества (должно быть положительным числом)
+        int quantity;
+        try {
+            quantity = Integer.parseInt(quantityStr);
+            if (quantity <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Введите корректное количество", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            inventoryId = getIntent().getLongExtra("inventory_id", -1);
+            // Обновление записи через DatabaseHelper
+            InventoryItem item = new InventoryItem();
+            item.setName(itemName);
+            item.setDescription(description);
+            item.setQuantity(quantity);
+            item.setGroupId(group);
+            item.setId(inventoryId);
+
+            int success = dbHelper.updateInventoryItem(item);
+            if (success != -1) {
+                Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            } else {
+                Toast.makeText(this, "Ошибка сохранения", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Ошибка сохранения: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setupDropdowns() {
