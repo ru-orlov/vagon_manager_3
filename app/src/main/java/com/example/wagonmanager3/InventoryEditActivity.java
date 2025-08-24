@@ -44,6 +44,11 @@ public class InventoryEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_edit);
 
+        // Setup ActionBar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        
         initViews();
         setupDropdowns();
         loadInventoryData();
@@ -59,6 +64,8 @@ public class InventoryEditActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_take_photo).setOnClickListener(v -> dispatchTakePictureIntent());
         findViewById(R.id.btn_remove_photo).setOnClickListener(v -> removePhoto());
+        findViewById(R.id.btn_save).setOnClickListener(v -> saveInventory());
+        findViewById(R.id.btn_cancel).setOnClickListener(v -> finish());
     }
 
     private void setupDropdowns() {
@@ -89,6 +96,13 @@ public class InventoryEditActivity extends AppCompatActivity {
                 etDescription.setText(item.getDescription());
                 etQuantity.setText(String.valueOf(item.getQuantity()));
                 
+                // Set photo if available
+                if (item.getPhotoPath() != null && !item.getPhotoPath().isEmpty()) {
+                    currentPhotoPath = item.getPhotoPath();
+                    ivPhoto.setImageURI(Uri.parse(currentPhotoPath));
+                    findViewById(R.id.btn_remove_photo).setVisibility(View.VISIBLE);
+                }
+                
                 // Set group dropdown value by finding the group name
                 String groupName = dbHelper.getInventoryGroupNameByUuid(item.getGroupId());
                 if (groupName != null) {
@@ -115,6 +129,9 @@ public class InventoryEditActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save) {
             saveInventory();
+            return true;
+        } else if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -165,6 +182,7 @@ public class InventoryEditActivity extends AppCompatActivity {
                 newItem.setName(name);
                 newItem.setDescription(description);
                 newItem.setQuantity(quantity);
+                newItem.setPhotoPath(currentPhotoPath);
                 newItem.setSyncStatus("new");
                 
                 long result = dbHelper.insertInventoryItem(newItem);
@@ -192,6 +210,7 @@ public class InventoryEditActivity extends AppCompatActivity {
                     existingItem.setDescription(description);
                     existingItem.setQuantity(quantity);
                     existingItem.setGroupId(groupUuid);
+                    existingItem.setPhotoPath(currentPhotoPath);
                     
                     int result = dbHelper.updateInventoryItem(existingItem);
                     

@@ -12,6 +12,7 @@ public class InventoryItem {
     private String name;
     private String description;
     private int quantity;
+    private String photoPath;
     private Date createdAt;
     private Date updatedAt;
     private String syncStatus;
@@ -91,6 +92,10 @@ public class InventoryItem {
         return updatedAt;
     }
 
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
     public String getSyncStatus() {
         return syncStatus;
     }
@@ -124,6 +129,11 @@ public class InventoryItem {
         this.updatedAt = new Date();
     }
 
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+        this.updatedAt = new Date();
+    }
+
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -148,6 +158,7 @@ public class InventoryItem {
         values.put(DbContract.InventoryItems.COLUMN_NAME, name);
         values.put(DbContract.InventoryItems.COLUMN_DESCRIPTION, description);
         values.put(DbContract.InventoryItems.COLUMN_QUANTITY, quantity);
+        values.put(DbContract.InventoryItems.COLUMN_PHOTO_PATH, photoPath);
         // Handle null dates before calling getTime() if they can be null
         if (createdAt != null) {
             values.put(DbContract.InventoryItems.COLUMN_CREATED_AT, createdAt.getTime());
@@ -167,6 +178,7 @@ public class InventoryItem {
         item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
         item.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)));
         item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)));
+        item.setPhotoPath(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_PHOTO_PATH)));
 
         long createdAtMillis = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT));
         if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT))) {

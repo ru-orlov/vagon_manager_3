@@ -247,6 +247,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(DbContract.InventoryItems.COLUMN_NAME, item.getName());
         values.put(DbContract.InventoryItems.COLUMN_DESCRIPTION, item.getDescription());
         values.put(DbContract.InventoryItems.COLUMN_QUANTITY, item.getQuantity());
+        values.put(DbContract.InventoryItems.COLUMN_PHOTO_PATH, item.getPhotoPath());
         values.put(DbContract.InventoryItems.COLUMN_CREATED_AT, System.currentTimeMillis());
         values.put(DbContract.InventoryItems.COLUMN_UPDATED_AT, System.currentTimeMillis());
         values.put(DbContract.InventoryItems.COLUMN_SYNC_STATUS, "new");
@@ -307,6 +308,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(DbContract.InventoryItems.COLUMN_DESCRIPTION, item.getDescription());
         values.put(DbContract.InventoryItems.COLUMN_QUANTITY, item.getQuantity());
         values.put(DbContract.InventoryItems.COLUMN_GROUP_ID, item.getGroupId());
+        values.put(DbContract.InventoryItems.COLUMN_PHOTO_PATH, item.getPhotoPath());
         values.put(DbContract.InventoryItems.COLUMN_UPDATED_AT, System.currentTimeMillis());
         values.put(DbContract.InventoryItems.COLUMN_SYNC_STATUS, "modified");
 
@@ -391,6 +393,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
                 item.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)));
                 item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)));
+                item.setPhotoPath(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_PHOTO_PATH)));
                 
                 long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT));
                 if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT))) {

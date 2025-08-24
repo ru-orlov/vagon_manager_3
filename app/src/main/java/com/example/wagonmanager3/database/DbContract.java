@@ -88,6 +88,7 @@ public class DbContract {
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_DESCRIPTION = "description";
         public static final String COLUMN_QUANTITY = "quantity";
+        public static final String COLUMN_PHOTO_PATH = "photo_path";
         public static final String COLUMN_CREATED_AT = "created_at";
         public static final String COLUMN_UPDATED_AT = "updated_at";
         public static final String COLUMN_SYNC_STATUS = "sync_status";
@@ -95,11 +96,12 @@ public class DbContract {
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_UUID + " TEXT,"
-                + COLUMN_GROUP_ID + " INTEGER,"
-                + COLUMN_VAGON_UUID + " INTEGER,"
+                + COLUMN_GROUP_ID + " TEXT,"
+                + COLUMN_VAGON_UUID + " TEXT,"
                 + COLUMN_NAME + " TEXT,"
                 + COLUMN_DESCRIPTION + " TEXT,"
                 + COLUMN_QUANTITY + " INTEGER,"
+                + COLUMN_PHOTO_PATH + " TEXT,"
                 + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_UPDATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                 + COLUMN_SYNC_STATUS + " TEXT NOT NULL DEFAULT 'synced' CHECK(" + COLUMN_SYNC_STATUS + " IN ('synced', 'modified', 'new', 'deleted'))"
