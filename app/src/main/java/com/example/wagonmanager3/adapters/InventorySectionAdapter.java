@@ -1,5 +1,7 @@
 package com.example.wagonmanager3.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.wagonmanager3.InventoryEditActivity;
 import com.example.wagonmanager3.R;
 import com.example.wagonmanager3.models.InventoryGroup;
 import com.example.wagonmanager3.models.InventoryItem;
@@ -81,8 +84,18 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((GroupViewHolder) holder).groupName.setText(group.getName());
         } else {
             InventoryItem item = (InventoryItem) obj;
-            ((ItemViewHolder) holder).itemName.setText(item.getName());
-            ((ItemViewHolder) holder).itemQuantity.setText(String.valueOf(item.getQuantity()));
+            ItemViewHolder itemHolder = (ItemViewHolder) holder;
+            itemHolder.itemName.setText(item.getName());
+            itemHolder.itemQuantity.setText(String.valueOf(item.getQuantity()));
+            
+            // Add click listener for editing
+            itemHolder.itemView.setOnClickListener(v -> {
+                Context context = v.getContext();
+                Intent intent = new Intent(context, InventoryEditActivity.class);
+                intent.putExtra("inventory_id", item.getId());
+                intent.putExtra("wagon_uuid", item.getVagonUuid());
+                context.startActivity(intent);
+            });
         }
     }
 
