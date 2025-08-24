@@ -408,6 +408,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return item;
     }
 
+    public InventoryItem getInventoryItemByUuid(String itemUuid) {
+        SQLiteDatabase db = getReadableDatabase();
+        InventoryItem item = null;
+
+        String query = "SELECT ii.*, ig.name AS group_name " +
+                "FROM " + DbContract.InventoryItems.TABLE_NAME + " ii " +
+                "LEFT JOIN " + DbContract.InventoryGroups.TABLE_NAME + " ig " +
+                "ON ii." + DbContract.InventoryItems.COLUMN_GROUP_ID + " = ig." + DbContract.InventoryGroups.COLUMN_UUID + " " +
+                "WHERE ii." + DbContract.InventoryItems.COLUMN_UUID + " = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{itemUuid})) {
+            if (cursor.moveToFirst()) {
+                item = new InventoryItem();
+                item.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)));
+                item.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UUID)));
+                item.setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)));
+                item.setVagonUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_VAGON_UUID)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
+                item.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)));
+                item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)));
+                
+                long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT));
+                if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT))) {
+                    item.setCreatedAt(new Date(createdAt));
+                }
+                
+                long updatedAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UPDATED_AT));
+                if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UPDATED_AT))) {
+                    item.setUpdatedAt(new Date(updatedAt));
+                }
+                
+                item.setSyncStatus(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_SYNC_STATUS)));
+            }
+        }
+        return item;
+    }
+
 
     public void clearAllTables() {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -434,11 +471,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         while (cursor.moveToNext()) {
             InventoryItem item = new InventoryItem();
+            item.setId(cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_ID)));
+            item.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UUID)));
             item.setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_GROUP_ID)));
             item.setVagonUuid(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_VAGON_UUID)));
             item.setName(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_NAME)));
             item.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_DESCRIPTION)));
             item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_QUANTITY)));
+            
+            // Set dates if available
+            long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT));
+            if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_CREATED_AT))) {
+                item.setCreatedAt(new Date(createdAt));
+            }
+            
+            long updatedAt = cursor.getLong(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UPDATED_AT));
+            if (!cursor.isNull(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_UPDATED_AT))) {
+                item.setUpdatedAt(new Date(updatedAt));
+            }
+            
+            item.setSyncStatus(cursor.getString(cursor.getColumnIndexOrThrow(DbContract.InventoryItems.COLUMN_SYNC_STATUS)));
             items.add(item);
         }
         cursor.close();
