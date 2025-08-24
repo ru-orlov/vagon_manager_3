@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="inventory_groups">
+        <item>Внутреннее оборудование</item>
+        <item>Электрооборудование</item>
+        <item>Оборудование ЭЧТК</item>
+        <item>Оборудование СКБ и СПП</item>
+        <item>Оборудование системы видео-инструментатора</item>
+        <item>Оборудование ПАК ИМ (WI-FI)</item>
+    </string-array>
+
+    <string-array name="inventory_conditions">
+        <item>Исправен</item>
+        <item>Требует ремонта</item>
+        <item>Неисправен</item>
+        <item>Отсутствует</item>
+    </string-array>
+</resources>

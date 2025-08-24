@@ -59,6 +59,10 @@ public class InventoryEditActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_take_photo).setOnClickListener(v -> dispatchTakePictureIntent());
         findViewById(R.id.btn_remove_photo).setOnClickListener(v -> removePhoto());
+        
+        // Connect save and cancel buttons
+        findViewById(R.id.btn_save).setOnClickListener(v -> saveInventory());
+        findViewById(R.id.btn_cancel).setOnClickListener(v -> finish());
     }
 
     private void setupDropdowns() {
@@ -86,7 +90,6 @@ public class InventoryEditActivity extends AppCompatActivity {
             
             if (item != null) {
                 etItemName.setText(item.getName());
-                etDescription.setText(item.getDescription());
                 etQuantity.setText(String.valueOf(item.getQuantity()));
                 
                 // Set group dropdown value by finding the group name
@@ -95,8 +98,33 @@ public class InventoryEditActivity extends AppCompatActivity {
                     actvGroup.setText(groupName, false);
                 }
                 
-                // If there's a condition field in the item model, set it here
-                // For now, we'll leave condition as default since it's not in the model
+                // Extract condition from description if it exists
+                String description = item.getDescription();
+                if (description != null) {
+                    // Look for condition in description
+                    if (description.contains("Состояние: ")) {
+                        String[] parts = description.split("Состояние: ");
+                        if (parts.length > 1) {
+                            String conditionPart = parts[1];
+                            // Extract the condition (first word/phrase before newline)
+                            String condition = conditionPart.split("\n")[0];
+                            actvCondition.setText(condition, false);
+                            
+                            // Remove condition from description for display
+                            String cleanDescription = parts[0].trim();
+                            if (parts.length > 1 && conditionPart.contains("\n")) {
+                                cleanDescription += conditionPart.substring(conditionPart.indexOf("\n"));
+                            }
+                            etDescription.setText(cleanDescription.trim());
+                        } else {
+                            etDescription.setText(description);
+                        }
+                    } else {
+                        etDescription.setText(description);
+                    }
+                } else {
+                    etDescription.setText("");
+                }
                 
                 setTitle("Редактировать элемент");
             }
@@ -144,6 +172,11 @@ public class InventoryEditActivity extends AppCompatActivity {
             return;
         }
 
+        // Append condition to description if provided
+        if (!condition.isEmpty()) {
+            description = description.isEmpty() ? "Состояние: " + condition : description + "\nСостояние: " + condition;
+        }
+
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         
         try {
@@ -170,6 +203,13 @@ public class InventoryEditActivity extends AppCompatActivity {
                 long result = dbHelper.insertInventoryItem(newItem);
                 
                 if (result > 0) {
+                    // Save photo if exists
+                    if (currentPhotoPath != null) {
+                        // For now, just keep the photo in the current location
+                        // In a real app, you might want to move it to a permanent location
+                        // and store the path in SharedPreferences or a separate table
+                    }
+                    
                     Toast.makeText(this, "Элемент добавлен", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();

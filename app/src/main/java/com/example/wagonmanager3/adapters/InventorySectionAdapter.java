@@ -26,6 +26,15 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static final int TYPE_ITEM = 1;
 
     private final List<Object> itemsForDisplay = new ArrayList<>();
+    private OnItemClickListener onItemClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(InventoryItem item);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.onItemClickListener = listener;
+    }
 
     public InventorySectionAdapter(List<InventoryGroup> groups, List<InventoryItem> items) {
         // Группируем элементы по группам и формируем плоский список для отображения
@@ -88,13 +97,18 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
             itemHolder.itemName.setText(item.getName());
             itemHolder.itemQuantity.setText(String.valueOf(item.getQuantity()));
             
-            // Add click listener for editing
+            // Add click listener for editing using interface
             itemHolder.itemView.setOnClickListener(v -> {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, InventoryEditActivity.class);
-                intent.putExtra("inventory_id", item.getId());
-                intent.putExtra("wagon_uuid", item.getVagonUuid());
-                context.startActivity(intent);
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClick(item);
+                } else {
+                    // Fallback to the old direct approach
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, InventoryEditActivity.class);
+                    intent.putExtra("inventory_id", item.getId());
+                    intent.putExtra("wagon_uuid", item.getVagonUuid());
+                    context.startActivity(intent);
+                }
             });
         }
     }

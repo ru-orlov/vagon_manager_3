@@ -34,6 +34,10 @@ public class WagonInventoryActivity extends AppCompatActivity {
         inventoryRecyclerView = findViewById(R.id.inventoryRecyclerView);
         String wagonUuid = getIntent().getStringExtra("WagonUuid");
 
+        // Setup FloatingActionButton
+        com.google.android.material.floatingactionbutton.FloatingActionButton fab = findViewById(R.id.fab_add_item);
+        fab.setOnClickListener(v -> openAddInventoryItem());
+
         // Теперь вызов getSupportActionBar() безопасен:
         getSupportActionBar().setTitle("Инвентарь вагона " + getWagonNumber(wagonUuid));
 
@@ -44,6 +48,12 @@ public class WagonInventoryActivity extends AppCompatActivity {
         System.out.println(">>> Inventory Groups: " + inventoryGroups.size());
 
         InventorySectionAdapter adapter = new InventorySectionAdapter(inventoryGroups, inventoryItems);
+        adapter.setOnItemClickListener(item -> {
+            Intent intent = new Intent(this, InventoryEditActivity.class);
+            intent.putExtra("inventory_id", item.getId());
+            intent.putExtra("wagon_uuid", item.getVagonUuid());
+            startActivityForResult(intent, 1);
+        });
         inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         inventoryRecyclerView.setAdapter(adapter);
 
@@ -114,6 +124,12 @@ public class WagonInventoryActivity extends AppCompatActivity {
         List<InventoryGroup> inventoryGroups = loadInventoryGroupList(wagonUuid);
         
         InventorySectionAdapter adapter = new InventorySectionAdapter(inventoryGroups, inventoryItems);
+        adapter.setOnItemClickListener(item -> {
+            Intent intent = new Intent(this, InventoryEditActivity.class);
+            intent.putExtra("inventory_id", item.getId());
+            intent.putExtra("wagon_uuid", item.getVagonUuid());
+            startActivityForResult(intent, 1);
+        });
         inventoryRecyclerView.setAdapter(adapter);
     }
 }
