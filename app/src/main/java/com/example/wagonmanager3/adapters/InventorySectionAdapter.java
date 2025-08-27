@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,8 +18,6 @@ import com.example.wagonmanager3.models.InventoryGroup;
 import com.example.wagonmanager3.models.InventoryItem;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,24 +28,24 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
     private static final int TYPE_ITEM = 1;
 
     private final List<Object> itemsForDisplay = new ArrayList<>();
+    private OnItemActionListener actionListener;
 
-    public InventorySectionAdapter(List<InventoryGroup> groups, List<InventoryItem> items) {
-        System.out.println(">>> InventorySectionAdapter");
-        items.forEach(val ->
-                System.out.println(">>> Item: " + val.getName() +
-                        ", ID: " + val.getId()));
+    // Интерфейс для обработки действий
+    public interface OnItemActionListener {
+        void onAddItem(InventoryItem item);
+        void onEditItem(InventoryItem item);
+        void onDeleteItem(InventoryItem item);
+    }
 
+    public InventorySectionAdapter(List<InventoryGroup> groups, List<InventoryItem> items, OnItemActionListener listener) {
+        this.actionListener = listener;
 
         // Группируем элементы по группам и формируем плоский список для отображения
         Map<String, List<InventoryItem>> displayData = new LinkedHashMap<>();
         for (InventoryGroup group : groups) {
-            // ВНИМАНИЕ: сравнивать groupId и group.getUuid() (или getId()), зависит от вашей модели!
             List<InventoryItem> groupItems = new ArrayList<>();
             for (InventoryItem item : items) {
-                System.out.println(">>> Comparing item groupId: " + item.getGroupId() +
-                        " with group UUID: " + group.getUuid());
-                if (String.valueOf(item.getGroupId()).equals(group.getUuid())
-                ) {
+                if (String.valueOf(item.getGroupId()).equals(group.getUuid())) {
                     groupItems.add(item);
                 }
             }
@@ -60,7 +60,6 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
                 itemsForDisplay.addAll(itemList);
             }
         }
-        System.out.println(">>>");
     }
 
     @Override
@@ -96,35 +95,44 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else {
             InventoryItem item = (InventoryItem) obj;
             ItemViewHolder itemHolder = (ItemViewHolder) holder;
-            itemHolder.itemName.setText(item.getName());
-            itemHolder.itemQuantity.setText(String.valueOf(item.getQuantity()));
-            
-            // Add click listener for editing
-            itemHolder.itemView.setOnClickListener(v -> {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, InventoryEditActivity.class);
-                intent.putExtra("inventory_id", item.getId());
-                intent.putExtra("group_id", item.getGroupId());
-                intent.putExtra("wagon_uuid", item.getVagonUuid());
-                context.startActivity(intent);
-            });
+            itemHolder.bind(item, actionListener);
         }
     }
 
     static class GroupViewHolder extends RecyclerView.ViewHolder {
         TextView groupName;
-        GroupViewHolder(View view) {
-            super(view);
-            groupName = view.findViewById(R.id.groupName);
+
+        GroupViewHolder(View itemView) {
+            super(itemView);
+            groupName = itemView.findViewById(R.id.groupName);
         }
     }
 
     static class ItemViewHolder extends RecyclerView.ViewHolder {
-        TextView itemName, itemQuantity;
-        ItemViewHolder(View view) {
-            super(view);
-            itemName = view.findViewById(R.id.itemName);
-            itemQuantity = view.findViewById(R.id.itemQuantity);
+        TextView itemName;
+        TextView itemQuantity;
+        ImageButton btnAdd;
+        ImageButton btnEdit;
+        ImageButton btnDelete;
+
+        ItemViewHolder(View itemView) {
+            super(itemView);
+            itemName = itemView.findViewById(R.id.itemName);
+            itemQuantity = itemView.findViewById(R.id.itemQuantity);
+            btnAdd = itemView.findViewById(R.id.btnAdd);
+            btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
+        }
+
+        void bind(InventoryItem item, OnItemActionListener listener) {
+            itemName.setText(item.getName());
+            itemQuantity.setText(String.valueOf(item.getQuantity()));
+
+            if (listener != null) {
+                btnAdd.setOnClickListener(v -> listener.onAddItem(item));
+                btnEdit.setOnClickListener(v -> listener.onEditItem(item));
+                btnDelete.setOnClickListener(v -> listener.onDeleteItem(item));
+            }
         }
     }
 }

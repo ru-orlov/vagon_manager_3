@@ -2,9 +2,9 @@ package com.example.wagonmanager3;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,45 +18,44 @@ import com.example.wagonmanager3.models.Wagon;
 
 import java.util.List;
 
-
-public class WagonInventoryActivity extends AppCompatActivity {
+public class WagonInventoryActivity extends AppCompatActivity implements InventorySectionAdapter.OnItemActionListener {
     private RecyclerView inventoryRecyclerView;
+    private String wagonUuid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wagon_inventory);
 
-        // Добавьте эти строки:
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         inventoryRecyclerView = findViewById(R.id.inventoryRecyclerView);
-        String wagonUuid = getIntent().getStringExtra("WagonUuid");
+        wagonUuid = getIntent().getStringExtra("WagonUuid");
 
-        // Теперь вызов getSupportActionBar() безопасен:
         getSupportActionBar().setTitle("Инвентарь вагона " + getWagonNumber(wagonUuid));
 
+        setupRecyclerView();
+        loadData();
+    }
+
+    private void setupRecyclerView() {
+        inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        inventoryRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+    }
+
+    private void loadData() {
         List<InventoryItem> inventoryItems = loadInventoryList(wagonUuid);
         List<InventoryGroup> inventoryGroups = loadInventoryGroupList(wagonUuid);
-        System.out.println(">>> Wagon UUID: " + wagonUuid);
-        System.out.println(">>> Inventory Items: " + inventoryItems.size());
-        System.out.println(">>> Inventory Groups: " + inventoryGroups.size());
 
-        InventorySectionAdapter adapter = new InventorySectionAdapter(inventoryGroups, inventoryItems);
-        inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        InventorySectionAdapter adapter = new InventorySectionAdapter(inventoryGroups, inventoryItems, this);
         inventoryRecyclerView.setAdapter(adapter);
-
     }
 
     private String getWagonNumber(String wagonUuid) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         Wagon wagon = dbHelper.getWagonByUuid(wagonUuid);
         return wagon.getNumber();
-    }
-    private void setupRecyclerView() {
-        inventoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        inventoryRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
 
     private List<InventoryItem> loadInventoryList(String wagonUuid) {
@@ -68,58 +67,52 @@ public class WagonInventoryActivity extends AppCompatActivity {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         return dbHelper.getInventoryGroupByWagonUuid(wagonUuid);
     }
-    private void showEmptyState() {
-        // Показать состояние "пусто"
-//        TextView emptyText = findViewById(R.string.empty_text);
-//        emptyText.setVisibility(View.VISIBLE);
-//        inventoryRecyclerView.setVisibility(View.GONE);
+
+    @Override
+    public void onAddItem(InventoryItem item) {
+        // Увеличить количество на 1
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        item.setQuantity(item.getQuantity() + 1);
+        // Обновить в базе данных
+        // dbHelper.updateInventoryItem(item);
+        Toast.makeText(this, "Количество увеличено", Toast.LENGTH_SHORT).show();
+        loadData(); // Перезагрузить данные
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_wagon_inventory, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_add_item) {
-            openAddInventoryItem();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-    
-    private void openAddInventoryItem() {
+    public void onEditItem(InventoryItem item) {
         Intent intent = new Intent(this, InventoryEditActivity.class);
-        intent.putExtra("wagon_uuid", getIntent().getStringExtra("WagonUuid"));
+        intent.putExtra("wagon_uuid", wagonUuid);
+        intent.putExtra("item_uuid", item.getUuid());
         startActivityForResult(intent, 1);
     }
-    
+
+    @Override
+    public void onDeleteItem(InventoryItem item) {
+        new AlertDialog.Builder(this)
+                .setTitle("Удаление")
+                .setMessage("Удалить позицию \"" + item.getName() + "\"?")
+                .setPositiveButton("Удалить", (dialog, which) -> {
+                    DatabaseHelper dbHelper = new DatabaseHelper(this);
+                    // dbHelper.deleteInventoryItem(item);
+                    Toast.makeText(this, "Позиция удалена", Toast.LENGTH_SHORT).show();
+                    loadData();
+                })
+                .setNegativeButton("Отмена", null)
+                .show();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            // Refresh the inventory list
-            refreshInventoryData();
+            loadData();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshInventoryData();
-    }
-    
-    private void refreshInventoryData() {
-        String wagonUuid = getIntent().getStringExtra("WagonUuid");
-        List<InventoryItem> inventoryItems = loadInventoryList(wagonUuid);
-        List<InventoryGroup> inventoryGroups = loadInventoryGroupList(wagonUuid);
-        
-        InventorySectionAdapter adapter = new InventorySectionAdapter(inventoryGroups, inventoryItems);
-        inventoryRecyclerView.setAdapter(adapter);
+        loadData();
     }
 }
