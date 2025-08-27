@@ -111,12 +111,12 @@ public class InventoryEditActivity extends AppCompatActivity {
 
         try {
             inventoryId = getIntent().getLongExtra("inventory_id", -1);
-            // Обновление записи через DatabaseHelper
+            String inventoryGroupUuid = getIntent().getStringExtra("group_id");
             InventoryItem item = new InventoryItem();
             item.setName(itemName);
             item.setDescription(description);
             item.setQuantity(quantity);
-            item.setGroupId(group);
+            item.setGroupId(inventoryGroupUuid);
             item.setId(inventoryId);
 
             int success = dbHelper.updateInventoryItem(item);
@@ -209,14 +209,18 @@ public class InventoryEditActivity extends AppCompatActivity {
 
                 // Set group dropdown value by finding the group name
                 String groupName = dbHelper.getInventoryGroupNameByUuid(item.getGroupId());
+
                 if (groupName != null) {
                     actvGroup.setText(groupName, false);
                 } else {
-                    Toast.makeText(this, "Группа не найдена для этого элемента", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Группа не найдена для этого элемента (UUID: " + item.getGroupId() + ")", Toast.LENGTH_SHORT).show();
+                    if (actvGroup.getAdapter() != null && actvGroup.getAdapter().getCount() > 0) {
+                        String firstGroup = (String) actvGroup.getAdapter().getItem(0);
+                        actvGroup.setText(firstGroup, false);
+                    }
                 }
 
                 // Set default condition since it's not stored in the model currently
-                // We can set a default value or leave it empty for user to select
                 try {
                     String[] conditions = getResources().getStringArray(R.array.inventory_conditions);
                     if (conditions.length > 0) {
@@ -226,16 +230,7 @@ public class InventoryEditActivity extends AppCompatActivity {
                     actvCondition.setText("Исправен", false); // Fallback default
                 }
 
-                // Store original values for change detection
-                originalName = etItemName.getText().toString();
-                originalDescription = etDescription.getText().toString();
-                originalQuantity = etQuantity.getText().toString();
-                originalGroup = actvGroup.getText().toString();
-                originalCondition = actvCondition.getText().toString();
-
-
                 setTitle("Редактировать элемент");
-                Toast.makeText(this, "Данные элемента загружены", Toast.LENGTH_SHORT).show();
             } else {
                 // Элемент не найден в базе данных
                 Toast.makeText(this, "Элемент не найден в базе данных (ID: " + inventoryId + ")", Toast.LENGTH_LONG).show();
@@ -248,18 +243,12 @@ public class InventoryEditActivity extends AppCompatActivity {
             try {
                 String[] conditions = getResources().getStringArray(R.array.inventory_conditions);
                 if (conditions.length > 0) {
-                    actvCondition.setText(conditions[0], false); // Set first condition as default
+                    actvCondition.setText(conditions[0], false);
                 }
             } catch (Exception e) {
                 actvCondition.setText("Исправен", false); // Fallback default
             }
         }
-        // Store original values for change detection (empty for new item)
-        originalName = "";
-        originalDescription = "";
-        originalQuantity = "";
-        originalGroup = "";
-        originalCondition = actvCondition.getText().toString();
     }
 
     private boolean hasUnsavedChanges() {
