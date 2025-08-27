@@ -9,12 +9,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
@@ -33,19 +35,33 @@ import java.util.Locale;
 
 public class InventoryEditActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
-
     private EditText etItemName, etDescription, etQuantity;
     private AutoCompleteTextView actvGroup, actvCondition;
     private ImageView ivPhoto;
     private ProgressBar progressBar;
+    private Button btnSave, btnCancel;
     private String currentPhotoPath;
     private long inventoryId = -1;
     private String wagonUuid;
+    private String originalName = "";
+    private String originalDescription = "";
+    private String originalQuantity = "";
+    private String originalGroup = "";
+    private String originalCondition = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_edit);
+        inventoryId = getIntent().getLongExtra("ITEM_ID", -1);
+        btnSave = findViewById(R.id.btn_save);
+        btnCancel = findViewById(R.id.btn_cancel);
+        btnSave.setOnClickListener(v -> saveInventory());
+
+        btnSave.setOnClickListener(v -> saveInventory());
+
+        // Set up cancel button click listener
+        btnCancel.setOnClickListener(v -> handleCancel());
 
         initViews();
         loadInventoryData(); // This will get wagonUuid from intent
@@ -63,6 +79,57 @@ public class InventoryEditActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_take_photo).setOnClickListener(v -> dispatchTakePictureIntent());
         findViewById(R.id.btn_remove_photo).setOnClickListener(v -> removePhoto());
+        findViewById(R.id.btn_cancel).setOnClickListener(v -> finish());
+        findViewById(R.id.btn_save).setOnClickListener(v -> saveInventoryItem());
+    }
+
+    private void saveInventoryItem() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        // Валидация → Сохранение в БД → setResult(RESULT_OK) → finish()
+        String itemName = etItemName.getText().toString().trim();
+        String description = etDescription.getText().toString().trim();
+        String quantityStr = etQuantity.getText().toString().trim();
+        String group = actvGroup.getText().toString().trim();
+        String condition = actvCondition.getText().toString().trim();
+        inventoryId = getIntent().getLongExtra("inventory_id", -1);
+
+        // Проверка названия (обязательно)
+        if (itemName.isEmpty()) {
+            Toast.makeText(this, "Введите название предмета", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Проверка количества (должно быть положительным числом)
+        int quantity;
+        try {
+            quantity = Integer.parseInt(quantityStr);
+            if (quantity <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Введите корректное количество", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            inventoryId = getIntent().getLongExtra("inventory_id", -1);
+            String inventoryGroupUuid = getIntent().getStringExtra("group_id");
+            InventoryItem item = new InventoryItem();
+            item.setName(itemName);
+            item.setDescription(description);
+            item.setQuantity(quantity);
+            item.setGroupId(inventoryGroupUuid);
+            item.setId(inventoryId);
+
+            int success = dbHelper.updateInventoryItem(item);
+            if (success != -1) {
+                Toast.makeText(this, "Изменения сохранены", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            } else {
+                Toast.makeText(this, "Ошибка сохранения", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Ошибка сохранения: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setupDropdowns() {
@@ -142,14 +209,18 @@ public class InventoryEditActivity extends AppCompatActivity {
 
                 // Set group dropdown value by finding the group name
                 String groupName = dbHelper.getInventoryGroupNameByUuid(item.getGroupId());
+
                 if (groupName != null) {
                     actvGroup.setText(groupName, false);
                 } else {
-                    Toast.makeText(this, "Группа не найдена для этого элемента", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Группа не найдена для этого элемента (UUID: " + item.getGroupId() + ")", Toast.LENGTH_SHORT).show();
+                    if (actvGroup.getAdapter() != null && actvGroup.getAdapter().getCount() > 0) {
+                        String firstGroup = (String) actvGroup.getAdapter().getItem(0);
+                        actvGroup.setText(firstGroup, false);
+                    }
                 }
 
                 // Set default condition since it's not stored in the model currently
-                // We can set a default value or leave it empty for user to select
                 try {
                     String[] conditions = getResources().getStringArray(R.array.inventory_conditions);
                     if (conditions.length > 0) {
@@ -160,7 +231,6 @@ public class InventoryEditActivity extends AppCompatActivity {
                 }
 
                 setTitle("Редактировать элемент");
-                Toast.makeText(this, "Данные элемента загружены", Toast.LENGTH_SHORT).show();
             } else {
                 // Элемент не найден в базе данных
                 Toast.makeText(this, "Элемент не найден в базе данных (ID: " + inventoryId + ")", Toast.LENGTH_LONG).show();
@@ -173,12 +243,68 @@ public class InventoryEditActivity extends AppCompatActivity {
             try {
                 String[] conditions = getResources().getStringArray(R.array.inventory_conditions);
                 if (conditions.length > 0) {
-                    actvCondition.setText(conditions[0], false); // Set first condition as default
+                    actvCondition.setText(conditions[0], false);
                 }
             } catch (Exception e) {
                 actvCondition.setText("Исправен", false); // Fallback default
             }
         }
+    }
+
+    private boolean hasUnsavedChanges() {
+        String currentName = etItemName.getText().toString();
+        String currentDescription = etDescription.getText().toString();
+        String currentQuantity = etQuantity.getText().toString();
+        String currentGroup = actvGroup.getText().toString();
+        String currentCondition = actvCondition.getText().toString();
+
+        return !originalName.equals(currentName) ||
+                !originalDescription.equals(currentDescription) ||
+                !originalQuantity.equals(currentQuantity) ||
+                !originalGroup.equals(currentGroup) ||
+                !originalCondition.equals(currentCondition);
+    }
+
+    /**
+     * Handle cancel button click
+     */
+    private void handleCancel() {
+        if (hasUnsavedChanges()) {
+            showCancelConfirmationDialog();
+        } else {
+            cancelAndFinish();
+        }
+    }
+
+    /**
+     * Show confirmation dialog when user has unsaved changes
+     */
+    private void showCancelConfirmationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Отменить изменения?")
+                .setMessage("У вас есть несохраненные изменения. Вы действительно хотите отменить редактирование?")
+                .setPositiveButton("Да, отменить", (dialog, which) -> {
+                    Toast.makeText(this, "Изменения не сохранены", Toast.LENGTH_SHORT).show();
+                    cancelAndFinish();
+                })
+                .setNegativeButton("Продолжить редактирование", null)
+                .show();
+    }
+
+    /**
+     * Cancel editing and finish activity
+     */
+    private void cancelAndFinish() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    /**
+     * Override back button to handle unsaved changes
+     */
+    @Override
+    public void onBackPressed() {
+        handleCancel();
     }
 
     @Override

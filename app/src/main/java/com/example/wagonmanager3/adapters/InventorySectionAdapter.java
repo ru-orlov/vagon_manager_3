@@ -16,6 +16,8 @@ import com.example.wagonmanager3.models.InventoryGroup;
 import com.example.wagonmanager3.models.InventoryItem;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +30,20 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
     private final List<Object> itemsForDisplay = new ArrayList<>();
 
     public InventorySectionAdapter(List<InventoryGroup> groups, List<InventoryItem> items) {
+        System.out.println(">>> InventorySectionAdapter");
+        items.forEach(val ->
+                System.out.println(">>> Item: " + val.getName() +
+                        ", ID: " + val.getId()));
+
+
         // Группируем элементы по группам и формируем плоский список для отображения
         Map<String, List<InventoryItem>> displayData = new LinkedHashMap<>();
         for (InventoryGroup group : groups) {
             // ВНИМАНИЕ: сравнивать groupId и group.getUuid() (или getId()), зависит от вашей модели!
             List<InventoryItem> groupItems = new ArrayList<>();
             for (InventoryItem item : items) {
+                System.out.println(">>> Comparing item groupId: " + item.getGroupId() +
+                        " with group UUID: " + group.getUuid());
                 if (String.valueOf(item.getGroupId()).equals(group.getUuid())
                 ) {
                     groupItems.add(item);
@@ -50,6 +60,7 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
                 itemsForDisplay.addAll(itemList);
             }
         }
+        System.out.println(">>>");
     }
 
     @Override
@@ -93,6 +104,7 @@ public class InventorySectionAdapter extends RecyclerView.Adapter<RecyclerView.V
                 Context context = v.getContext();
                 Intent intent = new Intent(context, InventoryEditActivity.class);
                 intent.putExtra("inventory_id", item.getId());
+                intent.putExtra("group_id", item.getGroupId());
                 intent.putExtra("wagon_uuid", item.getVagonUuid());
                 context.startActivity(intent);
             });

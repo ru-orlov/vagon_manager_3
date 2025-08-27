@@ -51,10 +51,10 @@ public class DatabaseInitializer {
         Wagon wagon2 = createWagon("Вагон 2495", wagon2Uuid, "Пассажирский");
         Wagon wagon3 = createWagon("Вагон 3753", wagon3Uuid, "Грузовой");
 
-//        // Добавляем по одному сканированию для каждого вагона
-//        createSingleScanHistory(wagon1, conductorUser);
-//        createSingleScanHistory(wagon2, conductorUser);
-//        createSingleScanHistory(wagon3, responsibleUser);
+        // Добавляем по одному сканированию для каждого вагона
+        createSingleScanHistory(wagon1, conductorUser);
+        createSingleScanHistory(wagon2, conductorUser);
+        createSingleScanHistory(wagon3, responsibleUser);
     }
 
     private void createSingleScanHistory(Wagon wagon, User user) {

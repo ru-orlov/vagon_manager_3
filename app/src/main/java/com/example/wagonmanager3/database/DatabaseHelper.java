@@ -290,16 +290,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long id = db.insert(DbContract.InventoryItems.TABLE_NAME, null, values);
         
-        if (id > 0) {
-            // Log the change
-            addChangeLog(
-                    DbContract.InventoryItems.TABLE_NAME,
-                    id,
-                    "create",
-                    null,
-                    item.toString()
-            );
-        }
+//        if (id > 0) {
+//            // Log the change
+//            addChangeLog(
+//                    DbContract.InventoryItems.TABLE_NAME,
+//                    id,
+//                    "create",
+//                    null,
+//                    item.toString()
+//            );
+//        }
         
         return id;
     }
@@ -340,6 +340,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         InventoryItem oldItem = getInventoryItemById(item.getId());
         
         ContentValues values = new ContentValues();
+        values.put(DbContract.InventoryItems.COLUMN_ID, item.getId());
         values.put(DbContract.InventoryItems.COLUMN_NAME, item.getName());
         values.put(DbContract.InventoryItems.COLUMN_DESCRIPTION, item.getDescription());
         values.put(DbContract.InventoryItems.COLUMN_QUANTITY, item.getQuantity());
@@ -355,13 +356,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (rowsAffected > 0 && oldItem != null) {
             // Log the change
-            addChangeLog(
-                    DbContract.InventoryItems.TABLE_NAME,
-                    item.getId(),
-                    "update",
-                    oldItem.toString(),
-                    item.toString()
-            );
+//            addChangeLog(
+//                    DbContract.InventoryItems.TABLE_NAME,
+//                    item.getId(),
+//                    "update",
+//                    oldItem.toString(),
+//                    item.toString()
+//            );
         }
 
         return rowsAffected;

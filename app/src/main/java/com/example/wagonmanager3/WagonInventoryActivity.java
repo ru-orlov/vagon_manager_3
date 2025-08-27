@@ -107,6 +107,12 @@ public class WagonInventoryActivity extends AppCompatActivity {
             refreshInventoryData();
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshInventoryData();
+    }
     
     private void refreshInventoryData() {
         String wagonUuid = getIntent().getStringExtra("WagonUuid");
